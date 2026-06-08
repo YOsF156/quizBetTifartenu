@@ -45,5 +45,31 @@ export const STAGE_BG = {
 // generic placeholder when a specific media file is missing (Temple from above)
 export const PLACEHOLDER_IMG = "media/הר הבית מבט על.jpeg";
 
+// Brand logo, shown on every ceremony/transition slide (top-center).
+export const LOGO = "media/logo.png";
+// Single fixed backdrop behind the floating photos on the ceremony slides.
+export const WELCOME_BG = "media/מקדש.png";
+// Images that float into the welcome / closing slides from alternating directions.
+export const WELCOME_IMAGES = [
+  "media/מעמד הקהל.jpeg",
+  "media/מקדש.png",
+  "media/הלויים משוררים.jpeg",
+  "media/הר הבית מבט על.jpeg",
+  "media/כהן גדול.png",
+  "media/כהן רגיל.png",
+  "media/ארון הברית.png",
+  "media/בארון הברית יש ספר תורה.jpg",
+  "media/תמונת זמן הצבעה.png",
+];
+
+// Opening slide shown on the display before each stage. The host advances from
+// the slide into the stage itself. (Adjust the per-stage image freely.)
+export const STAGE_INTRO_BG = {
+  1: "media/תמונת זמן הצבעה.png", // stage 1 opener — requested
+  2: "media/הר הבית מבט על.jpeg", // stage 2 opener
+  3: "media/הלויים משוררים.jpeg", // stage 3 opener
+  4: "media/מקדש.png", // stage 4 opener
+};
+
 export const STORAGE_KEY = "templeQuizState";
 export const CHANNEL_NAME = "templeQuiz";

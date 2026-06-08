@@ -53,9 +53,18 @@ const DEFAULT_STATE = {
 
   s2_player: 0,
   s2_phase: "media",
+  s2_playToken: 0, // bumped by the host to trigger playback on the display
   s2_comboReached: 0,
   // which of each media's 3 questions are shown/answerable (default: first 2)
   s2_selected: STAGE2.map(() => [0, 1]),
+
+  // opening slide: when true, the display shows the stage's intro slide and the
+  // host advances into the stage with "enterStage"
+  intro: true,
+  // main welcome slideshow ("ברוכים הבאים…"); shown on top of everything
+  welcome: true,
+  // closing ceremony slide ("תודה רבה…"); shown on top of everything
+  closing: false,
 
   editS1: null,
   editS2: null,
@@ -146,15 +155,16 @@ export function grandTotal(data) {
   return grandExcludingManual(data) + data.manualBonus;
 }
 
-// Grant the per-stage 200→+50 bonus if newly crossed. Returns the stage number
-// when newly hit (for FX), else null.
+// Detect the per-stage 200 crossing. Marks the ceiling as hit (so it fires once)
+// and returns the stage number when NEWLY crossed (for FX). The +50 bonus itself
+// is applied later, via applyCeilingBonus, so the meter climbs again only AFTER
+// the break animation has played.
 function checkStageThreshold(data, stage) {
   if (!data.ceilingOn) return null;
   const idx = stage - 1;
   if (data.stageCeilingHit[idx]) return null;
   if (stageParticipantTotal(data, stage) >= STAGE_THRESHOLD) {
     data.stageCeilingHit[idx] = true;
-    data.stageBonus[idx] = STAGE_BONUS;
     return stage;
   }
   return null;
@@ -183,6 +193,13 @@ export const useStore = create((set, get) => {
     persist(data);
   };
 
+  // After a stage crosses 200, the break animation plays first; ~5s later we add
+  // the +50 so the meter climbs again (Banner plays the climb sound on the rise).
+  const CEILING_BONUS_DELAY = 5000;
+  const scheduleCeiling = (stage) => {
+    setTimeout(() => get().applyCeilingBonus(stage), CEILING_BONUS_DELAY);
+  };
+
   return {
     data: loadState(),
 
@@ -196,15 +213,49 @@ export const useStore = create((set, get) => {
     setStage: (n) =>
       apply((d) => {
         d.stage = n;
-        // entering stage 1 enters a question → auto-arm; other stages clear it
-        d.timerStart = n === 1 ? Date.now() + TIMER_ARM_MS : null;
+        // show the opening slide for stages 1–4; the host then enters the stage.
+        d.intro = n >= 1 && n <= 4;
+        d.welcome = false;
+        d.closing = false;
+        // timer is armed when the host actually enters the stage, not on the slide
+        d.timerStart = null;
       }),
+    // advance from the opening slide into the stage itself
+    enterStage: () =>
+      apply((d) => {
+        d.intro = false;
+        d.welcome = false;
+        d.closing = false;
+        // entering stage 1 enters a question → auto-arm the countdown
+        if (d.stage === 1) d.timerStart = Date.now() + TIMER_ARM_MS;
+      }),
+    // re-show the opening slide for the current stage
+    showIntro: () =>
+      apply((d) => {
+        d.intro = true;
+        d.welcome = false;
+        d.closing = false;
+        d.timerStart = null;
+      }),
+    // ceremony overlays (mutually exclusive), shown over everything
+    toggleWelcome: () => apply((d) => { d.welcome = !d.welcome; d.closing = false; }),
+    toggleClosing: () => apply((d) => { d.closing = !d.closing; d.welcome = false; }),
     toggleSwitch: (k) =>
       apply((d) => {
         d[k] = !d[k];
         if (k === "ceilingOn" && d.ceilingOn) {
-          [1, 2, 3, 4].forEach((st) => checkStageThreshold(d, st));
+          // retroactive: apply any crossed bonuses immediately (no animation on a toggle)
+          [1, 2, 3, 4].forEach((st) => {
+            if (checkStageThreshold(d, st)) d.stageBonus[st - 1] = STAGE_BONUS;
+          });
         }
+      }),
+    // apply the deferred +50 ceiling bonus (called ~5s after the break animation)
+    applyCeilingBonus: (stage) =>
+      apply((d) => {
+        const idx = stage - 1;
+        if (!d.stageCeilingHit[idx] || d.stageBonus[idx] >= STAGE_BONUS) return;
+        d.stageBonus[idx] = STAGE_BONUS; // meter climbs again + climb sound
       }),
 
     // ---- STAGE 1: mark correct per-question; meter updates ONLY on reveal ----
@@ -235,6 +286,7 @@ export const useStore = create((set, get) => {
         ensureByQ(d);
         d.s1_revealed = d.s1_revealed ? 0 : 1;
         if (d.s1_revealed) {
+          d.timerStart = null; // revealing the answer ends the question → stop the timer
           const q = d.s1_index;
           const winners = [];
           d.scores.s1 = SCHOOLS.map((_, i) => d.s1_byQ[i].reduce((a, b) => a + b, 0));
@@ -248,6 +300,7 @@ export const useStore = create((set, get) => {
             stageHit: hit,
             amount: winners.length * S1_PER_Q,
           });
+          if (hit) scheduleCeiling(1);
         }
       }),
     // manual timer controls (start = immediate, reset = clear)
@@ -266,6 +319,12 @@ export const useStore = create((set, get) => {
         d.s2_phase = "media";
         d.timerStart = null;
       }),
+    // host presses "play video" → bump a token the display watches to start the clip
+    s2PlayVideo: () =>
+      apply((d) => {
+        d.s2_phase = "media";
+        d.s2_playToken = (d.s2_playToken || 0) + 1;
+      }),
     s2ShowQ: () =>
       apply((d) => {
         d.s2_phase = "questions";
@@ -279,6 +338,7 @@ export const useStore = create((set, get) => {
         d.scores.s2[i] = d.s2_correctCount[i] * S2_PER_CORRECT;
         const hit = checkStageThreshold(d, 2);
         fireFx(d, { type: "score2", schoolIdx: i, stageHit: hit, amount: S2_PER_CORRECT });
+        if (hit) scheduleCeiling(2);
         evaluateCombo(d);
       }),
     s2Undo: (i) =>
@@ -290,6 +350,8 @@ export const useStore = create((set, get) => {
       }),
 
     // ---- STAGE 3/4 manual numeric ----
+    // stepper +/− adjusts the score WITHOUT confetti on every point (only the
+    // ceiling break still celebrates); the points confetti fires once on commit.
     addScore: (stageKey, i, delta, max) =>
       apply((d) => {
         const arr = d.scores[stageKey];
@@ -299,8 +361,12 @@ export const useStore = create((set, get) => {
         arr[i] = nv;
         const stage = stageOfKey(stageKey);
         const hit = checkStageThreshold(d, stage);
-        fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: nv - old });
+        if (hit) {
+          fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: 0 });
+          scheduleCeiling(stage);
+        }
       }),
+    // commit (typed value on blur/Enter) = end of entry → celebrate once
     setScore: (stageKey, i, val, max) =>
       apply((d) => {
         const arr = d.scores[stageKey];
@@ -309,7 +375,10 @@ export const useStore = create((set, get) => {
         arr[i] = nv;
         const stage = stageOfKey(stageKey);
         const hit = checkStageThreshold(d, stage);
-        fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: nv - old });
+        if (nv > old || hit) {
+          fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: Math.max(0, nv - old) });
+        }
+        if (hit) scheduleCeiling(stage);
       }),
 
     // ---- manual GENERAL bonus ±10 (big animation on add) ----
@@ -332,10 +401,11 @@ export const useStore = create((set, get) => {
           hit = checkStageThreshold(d, stage);
         }
         fireFx(d, { type: "audience", schoolIdx: i, stageHit: hit, amount: AUDIENCE_BONUS });
+        if (hit) scheduleCeiling(stage);
       }),
 
     resetAll: () => {
-      if (!confirm("לאפס את כל החידון? (כולל ניקוד ובונוסים)")) return;
+      if (!confirm("לאפס את כל החידון? (כולל ניקוד ובונוסים בכל השלבים)")) return;
       apply((d) => {
         const e1 = d.editS1;
         const e2 = d.editS2;
@@ -343,6 +413,28 @@ export const useStore = create((set, get) => {
         Object.assign(d, fresh);
         d.editS1 = e1;
         d.editS2 = e2;
+      });
+    },
+
+    // reset only the current stage's scores + that stage's meter/ceiling/audience
+    resetStage: (stage) => {
+      const names = { 1: "א'", 2: "ב'", 3: "ג'", 4: "ד'" };
+      if (!confirm(`לאפס את הניקוד של שלב ${names[stage] || stage} בלבד?`)) return;
+      apply((d) => {
+        const key = STAGE_KEY[stage];
+        if (key) d.scores[key] = freshScores();
+        d.stageBonus[stage - 1] = 0;
+        d.stageCeilingHit[stage - 1] = false;
+        d.stageAudience[stage - 1] = 0;
+        if (stage === 1) {
+          d.s1_byQ = null;
+          d.s1_revealed = 0;
+        }
+        if (stage === 2) {
+          d.s2_correctCount = freshScores();
+          d.s2_comboReached = 0;
+          d.comboTotal = 0;
+        }
       });
     },
 

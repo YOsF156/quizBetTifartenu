@@ -7,10 +7,21 @@ import DisplayS4 from "../components/display/DisplayS4.jsx";
 import Finale from "../components/display/Finale.jsx";
 import Banner from "../components/display/Banner.jsx";
 import FxRunner from "../components/display/FxRunner.jsx";
+import IntroSlide from "../components/display/IntroSlide.jsx";
+import CeremonySlide from "../components/display/CeremonySlide.jsx";
 
 export default function Display() {
   const stage = useStore((s) => s.data.stage);
+  const intro = useStore((s) => s.data.intro);
+  const welcome = useStore((s) => s.data.welcome);
+  const closing = useStore((s) => s.data.closing);
   const screensaver = useStore((s) => s.data.screensaver);
+
+  const ceremony = welcome ? (
+    <CeremonySlide kicker="בית תפארתנו" title="ברוכים הבאים לחידון בית תפארתנו" hint="החידון מתחיל…" />
+  ) : closing ? (
+    <CeremonySlide kicker="בית תפארתנו · חידון המקדש" title="תודה רבה ובהצלחה!" hint="עד לפעם הבאה" />
+  ) : null;
 
   // Screensaver overlay — controlled from the host board. Sits above everything.
   const ssOverlay = screensaver && (
@@ -29,6 +40,7 @@ export default function Display() {
       <div id="display" className="view active" style={{ display: "block" }}>
         <FxRunner />
         <Finale />
+        {ceremony}
         {ssOverlay}
       </div>
     );
@@ -39,7 +51,7 @@ export default function Display() {
   // dark question text stays legible — no extra overlay element needed.
   const bgStyle = bg
     ? {
-        backgroundImage: `linear-gradient(180deg, rgba(255,253,248,.80), rgba(251,243,231,.86)), url("${bg}")`,
+        backgroundImage: `linear-gradient(180deg, rgba(255,253,248,.55), rgba(251,243,231,.63)), url("${bg}")`,
       }
     : undefined;
 
@@ -51,6 +63,7 @@ export default function Display() {
         id="d-stage"
         style={bgStyle}
       >
+        <div className="flyname-layer" id="flyfx" />
         <div className="stage-badge">
           <span className="pill" id="d-badge">
             {STAGE_NAMES[stage]}
@@ -69,6 +82,8 @@ export default function Display() {
         </div>
       </div>
       <Banner />
+      {stage >= 1 && stage <= 4 && <IntroSlide stage={stage} leaving={!intro} />}
+      {ceremony}
       {ssOverlay}
     </div>
   );

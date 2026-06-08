@@ -51,7 +51,6 @@ export default function ScoreNumeric({ stageKey, step, max }) {
   const scores = useStore((s) => s.data.scores[stageKey]);
   const addScore = useStore((s) => s.addScore);
   const setScore = useStore((s) => s.setScore);
-  const resetAll = useStore((s) => s.resetAll);
 
   return (
     <div className="panel">
@@ -72,11 +71,6 @@ export default function ScoreNumeric({ stageKey, step, max }) {
             setScore={setScore}
           />
         ))}
-      </div>
-      <div className="controls" style={{ marginTop: 16 }}>
-        <button className="ghost" onClick={resetAll}>
-          איפוס ניקוד
-        </button>
       </div>
     </div>
   );

@@ -8,12 +8,14 @@ export default function HostS2() {
   const data = useStore((s) => s.data);
   const s2SetPlayer = useStore((s) => s.s2SetPlayer);
   const s2ShowMedia = useStore((s) => s.s2ShowMedia);
+  const s2PlayVideo = useStore((s) => s.s2PlayVideo);
   const s2ShowQ = useStore((s) => s.s2ShowQ);
   const s2Correct = useStore((s) => s.s2Correct);
   const s2Undo = useStore((s) => s.s2Undo);
   const startTimer = useStore((s) => s.startTimer);
   const resetTimer = useStore((s) => s.resetTimer);
   const resetAll = useStore((s) => s.resetAll);
+  const resetStage = useStore((s) => s.resetStage);
 
   const Q = s2Q(data);
   const round = Q[data.s2_player];
@@ -22,6 +24,7 @@ export default function HostS2() {
 
   return (
     <div className="s2-host">
+      <div className="host-cols">
       <div className="panel">
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span className="pill">{STAGE_NAMES[2]}</span>
@@ -29,6 +32,13 @@ export default function HostS2() {
           <div className="controls" style={{ margin: 0, marginRight: "auto", alignItems: "center" }}>
             <button className={data.s2_phase === "media" ? "primary" : ""} onClick={s2ShowMedia}>
               ▶ מדיה
+            </button>
+            <button
+              className="primary"
+              onClick={s2PlayVideo}
+              title="מפעיל את הסרטון בגדול על מסך ההקרנה (דרוש קליק אחד על ההקרנה בתחילת המופע כדי לאפשר שמע)"
+            >
+              ▶ הפעל סרטון
             </button>
             <button className={data.s2_phase === "questions" ? "primary" : ""} onClick={s2ShowQ}>
               שאלות ▶
@@ -81,6 +91,7 @@ export default function HostS2() {
                   title="הגדר כעונה"
                 >
                   {s.school}
+                  {s.player && <small className="player-nm">{s.player}</small>}
                   <small>{cc}/{max} תשובות</small>
                 </span>
                 <span className="sc">{data.scores.s2[i]}</span>
@@ -101,14 +112,21 @@ export default function HostS2() {
             );
           })}
         </div>
-        <div className="controls" style={{ marginTop: 10 }}>
-          <button className="ghost" onClick={resetAll}>
-            איפוס ניקוד
-          </button>
-        </div>
       </div>
 
-      <GeneralBonusBar />
+      <div className="panel">
+        <h3>איפוס וניקוד כללי</h3>
+        <div className="controls">
+          <button className="ghost" onClick={() => resetStage(2)}>
+            איפוס שלב ב'
+          </button>
+          <button className="ghost danger" onClick={resetAll}>
+            איפוס כללי
+          </button>
+        </div>
+        <GeneralBonusBar embedded />
+      </div>
+      </div>
     </div>
   );
 }

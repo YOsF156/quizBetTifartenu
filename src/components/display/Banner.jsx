@@ -24,6 +24,9 @@ export default function Banner() {
 
   const stage = data.stage;
   const stageHit = data.stageCeilingHit[stage - 1];
+  // the bar turns purple only once the +50 bonus is actually applied (after the
+  // break animation), so the recolor coincides with the second climb
+  const broke = data.stageBonus[stage - 1] > 0;
   const meterValue = stageMeterValue(data, stage);
   const fillPct = Math.min(100, (meterValue / STAGE_METER_MAX) * 100);
   const grand = grandTotal(data);
@@ -50,7 +53,7 @@ export default function Banner() {
     <aside className="banner" id="banner">
       <div className="meter">
         <div
-          className={"meter-fill" + (stageHit ? " purple" : "")}
+          className={"meter-fill" + (broke ? " purple" : "")}
           style={{ height: `${fillPct}%` }}
         ></div>
         <div className="meter-total">ניקוד השלב</div>
@@ -76,7 +79,7 @@ export default function Banner() {
           );
         })}
         <div
-          className={"meter-flag" + (stageHit ? " purple" : "")}
+          className={"meter-flag" + (broke ? " purple" : "")}
           style={{ bottom: `${Math.min(93, Math.max(7, fillPct))}%` }}
         >
           {meterValue}

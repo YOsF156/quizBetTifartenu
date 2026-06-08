@@ -5,16 +5,16 @@
 // name shown ONCE in the banner; participants sharing a group are merged there
 // (Orot Rashi sends two representatives who promote one school together).
 export const SCHOOLS = [
-  { school: 'תתמ"ד אור לציון - כוכב יעקב' },
-  { school: 'ת"ת בני יוסף - שדרות' },
-  { school: "תורני הראל - בית שמש" },
-  { school: "נועם חיים - דימונה" },
-  { school: 'אורות רש"י 1', group: 'אורות רש"י - נתניה' },
-  { school: 'אורות רש"י 2', group: 'אורות רש"י - נתניה' },
-  { school: "אורות בנים - בית שמש" },
-  { school: 'ת"ת מצפה יריחו' },
-  { school: 'ת"ת רמלה' },
-  { school: 'ת"ת זמרת הארץ - ישוב עמיחי' },
+  { school: 'תתמ"ד אור לציון - כוכב יעקב', player: "איתי תמים" },
+  { school: 'ת"ת בני יוסף - שדרות', player: "הלל דויטש" },
+  { school: "תורני הראל - בית שמש" }, // שם משתתף טרם נמסר
+  { school: "נועם חיים - דימונה", player: "ארבל דוד אפשטיין" },
+  { school: 'אורות רש"י 1', group: 'אורות רש"י - נתניה', player: "עמנואל סולקיס" },
+  { school: 'אורות רש"י 2', group: 'אורות רש"י - נתניה', player: "ידידיה יוליוס" },
+  { school: "אורות בנים - בית שמש", player: "עזריאל גולדמן" },
+  { school: 'ת"ת מצפה יריחו', player: "נריה יעקבסון" },
+  { school: 'ת"ת רמלה', player: "אוהד לוי" },
+  { school: 'ת"ת זמרת הארץ - ישוב עמיחי', player: "לב ארי יהודה יצהרי" },
 ];
 
 // שלב א' — 10 אמריקאיות (correct = index)
@@ -192,7 +192,7 @@ export const STAGE2 = [
   },
   {
     media: "סרטון — אלקנה והמשכן בשילה",
-    video: "media/מה אלקנה היה עושה.wmv",
+    video: "media/מה אלקנה היה עושה.mp4",
     questions: [
       "מה אלקנה היה עושה כדי למשוך את העם להגיע לשילה?",
       "מה היה ההבדל בין המשכן במדבר למשכן בשילה?",

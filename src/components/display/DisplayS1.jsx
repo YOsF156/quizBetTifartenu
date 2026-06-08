@@ -20,9 +20,6 @@ export default function DisplayS1() {
         </div>
       )}
 
-      <div className="d-num">
-        שאלה {qi + 1} / {Q.length}
-      </div>
       <div className={"d-text " + accent}>{q.text}</div>
 
       {!data.s1_revealed ? (
