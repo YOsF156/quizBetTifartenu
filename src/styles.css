@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@400;500;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+:root{--bg:#0a0e1a;--bg2:#111729;--panel:#161d33;--panel2:#1d2640;--border:#2a3656;--text:#f0ece0;--muted:#8b93ad;--gold:#d4af37;--gold-bright:#f5d76e;--gold-deep:#9a7b1f;--ok:#4ade80;--bad:#f87171}
+body{font-family:'Heebo',sans-serif;background:radial-gradient(ellipse at top,#16203a 0%,transparent 55%),radial-gradient(ellipse at bottom right,#1a1530 0%,transparent 50%),var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3{font-family:'Frank Ruhl Libre',serif}
+#landing{max-width:560px;margin:70px auto;text-align:center;padding:24px}
+#landing h1{font-size:40px;color:var(--gold-bright);letter-spacing:1px;margin-bottom:6px}
+#landing .sub{color:var(--gold);font-size:16px;margin-bottom:8px}
+#landing p{color:var(--muted);margin-bottom:36px;font-size:14px;line-height:1.6}
+.links{display:flex;gap:16px}
+.links a{flex:1;padding:28px 20px;background:var(--panel);border:1px solid var(--border);border-radius:14px;color:var(--text);text-decoration:none;transition:all .18s}
+.links a:hover{border-color:var(--gold);transform:translateY(-2px)}
+.links a strong{display:block;font-size:20px;margin-bottom:6px;color:var(--gold-bright)}
+.links a span{font-size:13px;color:var(--muted)}
+.view{display:none}.view.active{display:block}
+#host{max-width:1140px;margin:0 auto;padding:24px}
+.host-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 20px;background:var(--panel);border:1px solid var(--border);border-radius:14px;margin-bottom:20px}
+.host-bar .title{font-family:'Frank Ruhl Libre',serif;font-size:20px;color:var(--gold-bright);margin-left:auto}
+.stage-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.stage-tabs button{font-size:13px;padding:8px 14px}
+.stage-tabs button.on{background:var(--gold-deep);border-color:var(--gold);color:#fff}
+.toggles{display:flex;gap:18px;align-items:center}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+.switch{width:40px;height:22px;background:var(--border);border-radius:99px;position:relative;transition:background .2s;flex-shrink:0}
+.switch::after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on .switch{background:var(--ok)}
+.toggle.on .switch::after{transform:translateX(-18px)}
+button{font-family:'Heebo',sans-serif;font-size:15px;padding:11px 18px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text);cursor:pointer;transition:all .15s}
+button:hover:not(:disabled){border-color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.primary{background:linear-gradient(135deg,var(--gold),var(--gold-deep));border-color:var(--gold);color:#1a1505;font-weight:700}
+button.ghost{background:transparent}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.panel h3{font-size:15px;color:var(--gold);margin-bottom:14px;font-weight:700}
+.q-num{color:var(--muted);font-size:13px}
+.q-text{font-family:'Frank Ruhl Libre',serif;font-size:22px;margin:8px 0 16px;line-height:1.4}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+#host .options{display:grid;gap:8px;max-width:660px}
+#host .opt{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1px solid var(--border);border-radius:9px;background:var(--panel2);font-size:14px}
+#host .opt .letter{width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--border);font-weight:700;font-size:13px}
+#host .opt.correct{border-color:var(--ok);background:rgba(74,222,128,.12)}
+#host .opt.correct .letter{background:var(--ok);color:#06210f}
+.score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.score-card{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px}
+.score-card .nm{flex:1;font-size:13px;line-height:1.3}
+.score-card .nm small{color:var(--muted);font-size:11px;display:block}
+.score-card .sc{font-variant-numeric:tabular-nums;min-width:46px;text-align:center;font-weight:700;color:var(--gold-bright)}
+.score-card.maxed{border-color:var(--ok)}
+.score-card.maxed .sc{color:var(--ok)}
+.score-card .btns{display:flex;gap:4px}
+.score-card .btns button{padding:5px 9px;font-size:13px}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper input{width:60px;padding:7px;text-align:center;font-size:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text)}
+select{padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Heebo';font-size:14px;max-width:100%}
+.pill{display:inline-block;font-size:12px;color:var(--gold);border:1px solid var(--gold-deep);padding:3px 10px;border-radius:99px}
+.hint{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}
+.combo-status{font-size:13px;color:var(--gold-bright);margin-top:8px}
+details{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+details summary{cursor:pointer;color:var(--gold);font-size:14px;padding:4px 0;user-select:none}
+.edit-row{padding:10px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:var(--panel2)}
+.edit-row label{font-size:12px;color:var(--muted);display:block;margin-top:6px}
+.seat-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.seat-chip{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:5px 8px}
+.seat-chip .seat-nm{font-size:12px;line-height:1.2;max-width:160px}
+.seat-chip .seat-nm small{display:block;color:var(--muted);font-size:10px}
+.seat-chip button{padding:4px 9px;font-size:13px}
+.edit-row textarea,.edit-row input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Heebo';font-size:13px;padding:7px;margin-top:3px;resize:vertical}
+/* DISPLAY */
+#display{display:none}
+/* banner capped at ~1/5 of the screen (never wider than 380px) */
+#display.active{display:grid;grid-template-columns:1fr clamp(300px,20vw,380px);min-height:100vh}
+/* ---- LIGHT question section (banner stays dark) ---- */
+.stage-area{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;text-align:center;min-height:100vh;position:relative;
+  background:
+    radial-gradient(circle, rgba(214,165,95,.085) 1px, transparent 1.7px) 0 0 / 30px 30px,
+    radial-gradient(ellipse 95% 55% at 50% 122%, rgba(243,188,126,.85), rgba(243,188,126,0) 60%),
+    radial-gradient(ellipse 72% 55% at 93% 7%, rgba(247,220,176,.62), transparent 60%),
+    radial-gradient(ellipse 66% 50% at 5% 6%, rgba(247,220,176,.48), transparent 60%),
+    linear-gradient(180deg,#fffdf8,#fbf3e7);
+  color:#2c2740}
+.stage-badge{position:absolute;top:28px;right:46px;z-index:2}
+.stage-badge .pill{font-size:26px;padding:11px 28px;font-weight:700;color:var(--gold-deep);border-color:#d9c48b;background:rgba(255,255,255,.82);box-shadow:0 4px 14px rgba(120,90,30,.12)}
+.d-num{color:var(--gold-deep);font-size:30px;margin-bottom:18px;letter-spacing:1px;font-weight:700}
+.d-text{font-family:'Frank Ruhl Libre',serif;font-size:68px;line-height:1.28;max-width:1100px;margin-bottom:8px;color:#3a3450;font-weight:700}
+.d-text.gold{color:#c79a2b}
+.d-text.coral{color:#e07a63}
+.d-idle{color:#9a8f78;font-size:30px;font-family:'Frank Ruhl Libre',serif}
+.d-active-player{color:#c79a2b;font-size:46px;margin-bottom:8px;font-weight:700;font-family:'Frank Ruhl Libre',serif}
+.d-active-sub{color:#8a8273;font-size:26px;margin-bottom:26px}
+/* alternating illustration on the left */
+/* reserve right room on stage 1 so the illustration never overlaps the cards */
+.stage-area.has-illu{padding-right:clamp(170px,19vw,320px)}
+.q-illustration{position:absolute;right:30px;bottom:42px;max-height:60vh;max-width:min(17vw,290px);width:auto;object-fit:contain;filter:drop-shadow(0 12px 24px rgba(0,0,0,.18));pointer-events:none;z-index:1}
+/* stage-1 timer slot, top-left, keeps our timer look + pulse on light bg */
+.s1-timer-slot{position:absolute;top:24px;left:44px;display:flex;flex-direction:column;align-items:center;gap:2px;z-index:2}
+.s1-timer-label{color:var(--gold-deep);font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:15px;letter-spacing:1px}
+.s1-timer-slot .timer.big{font-size:46px;color:var(--gold-deep);text-shadow:0 2px 10px rgba(199,154,43,.25);margin:0}
+.s1-timer-slot .timer.idle{color:#b9a77e}
+#display .options{display:flex;flex-direction:column;gap:16px;max-width:1100px;width:100%;margin-top:26px;z-index:1}
+#display .opt{display:flex;align-items:center;gap:20px;padding:0 34px;min-height:96px;border:none;border-radius:12px;background:#fff;color:#33304a;font-size:38px;font-weight:600;text-align:right;box-shadow:0 6px 16px rgba(90,66,20,.12);opacity:0;animation:optFade .9s ease forwards}
+#display .opt .opt-text{flex:1;text-align:right}
+#display .opt:nth-child(1){animation-delay:.15s}
+#display .opt:nth-child(2){animation-delay:.65s}
+#display .opt:nth-child(3){animation-delay:1.15s}
+#display .opt:nth-child(4){animation-delay:1.65s}
+#display .opt .letter{width:70px;height:70px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:11px;background:#2f9fd6;color:#fff;font-weight:800;font-size:34px;box-shadow:0 3px 8px rgba(47,159,214,.35)}
+@keyframes optFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.media-box{width:min(840px,82%);aspect-ratio:16/9;border-radius:18px;border:2px solid #d9c48b;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;box-shadow:0 12px 34px rgba(90,66,20,.14)}
+.media-box .icon{font-size:64px}
+.media-box .label{color:var(--gold-deep);font-size:22px}
+.media-box .ph{color:#9a8f78;font-size:14px}
+.media-box img{max-width:100%;max-height:100%;border-radius:16px;object-fit:contain}
+.q-list{display:flex;flex-direction:column;gap:14px;max-width:1100px;width:100%;margin-top:24px;z-index:1}
+.q-item{display:flex;align-items:center;gap:18px;padding:26px 34px;border:none;border-radius:12px;background:#fff;color:#33304a;font-weight:600;font-size:38px;text-align:right;box-shadow:0 6px 16px rgba(90,66,20,.12);opacity:0;animation:optFade 1s ease forwards}
+.q-item:nth-child(1){animation-delay:.2s}
+.q-item:nth-child(2){animation-delay:1.1s}
+.q-item:nth-child(3){animation-delay:2.0s}
+.q-item:nth-child(4){animation-delay:2.9s}
+.q-item .num{width:42px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#2f9fd6;color:#fff;font-weight:800;font-size:20px;box-shadow:0 3px 8px rgba(47,159,214,.35)}
+@keyframes fadeOut{to{opacity:0;transform:scale(.85);height:0;margin:0;padding:0;border:0}}
+@keyframes heroIn{0%{opacity:0;transform:scale(.6)}60%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+#display .opt.fade{animation:fadeOut .4s ease forwards}
+.hero{display:flex;align-items:center;gap:24px;padding:0 48px;min-height:128px;width:100%;max-width:1100px;border:2px solid var(--ok);border-radius:14px;background:rgba(74,222,128,.16);color:#15692f;font-family:'Frank Ruhl Libre',serif;font-size:52px;font-weight:700;animation:heroIn .6s cubic-bezier(.2,.8,.3,1) .3s both;box-shadow:0 12px 38px rgba(74,222,128,.3);margin-top:26px;z-index:1}
+.hero .hero-text{flex:1;text-align:right}
+.hero .letter{width:68px;height:68px;font-size:33px;background:var(--ok);color:#06210f;display:flex;align-items:center;justify-content:center;border-radius:13px;flex-shrink:0}
+/* BANNER */
+.banner{background:linear-gradient(180deg,var(--bg2),var(--bg));padding:16px 12px;display:grid;grid-template-columns:60px 1fr;gap:12px;height:100vh;position:relative}
+/* soft seam: the light/gold question background spills onto the banner's right edge
+   (z-index 1 keeps it above the meter fill but below the marks z3 / flag z5) */
+.banner::after{content:'';position:absolute;top:0;bottom:0;right:0;width:80px;pointer-events:none;z-index:1;
+  background:linear-gradient(to left, rgba(253,247,236,.5), rgba(253,247,236,.16) 40px, rgba(253,247,236,0) 80px)}
+.meter{background:var(--panel);border:1px solid var(--gold-deep);border-radius:14px;position:relative;overflow:hidden;height:100%}
+.meter-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,var(--gold-bright),var(--gold-deep));transition:height 1.1s cubic-bezier(.3,1,.4,1)}
+.meter-fill::after{content:'';position:absolute;top:0;left:0;right:0;height:16px;background:rgba(255,255,255,.4);filter:blur(4px)}
+.meter-total{position:absolute;top:0;bottom:0;left:0;right:0;text-align:center;font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:17px;letter-spacing:2px;color:rgba(26,21,5,.7);writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none}
+.meter-mark{position:absolute;left:50%;transform:translate(-50%,50%);font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;color:#fff8e6;text-shadow:0 1px 4px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.9);z-index:3;white-space:nowrap;pointer-events:none}
+.meter-mark.edge{transform:translateX(-50%)} /* 0 and 600 sit flush on the bottom/top outline */
+.meter-mark.hit{color:#fff}
+@keyframes ceilBreak{0%{transform:translate(-50%,50%) scale(1)}30%{transform:translate(-50%,50%) scale(1.7);filter:brightness(1.7)}100%{transform:translate(-50%,50%) scale(1)}}
+.meter-mark.breaking{animation:ceilBreak .9s ease}
+.right-col{display:flex;flex-direction:column;gap:10px;min-height:0}
+.total-box{text-align:center;padding:10px;background:var(--panel);border:1px solid var(--gold-deep);border-radius:12px;flex-shrink:0}
+.total-box{padding:12px}
+.total-box .lbl{font-size:17px;color:var(--gold);font-weight:700;letter-spacing:1px}
+.total-box .val{font-family:'Frank Ruhl Libre',serif;font-size:68px;font-weight:900;color:var(--gold-bright);font-variant-numeric:tabular-nums;line-height:1.05;text-shadow:0 0 30px rgba(245,215,110,.45)}
+.total-box.flash{animation:flashGold .8s ease}
+@keyframes flashGold{0%,100%{box-shadow:0 0 0 rgba(245,215,110,0)}50%{box-shadow:0 0 36px rgba(245,215,110,.7);border-color:var(--gold-bright)}}
+.schools{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;justify-content:space-between}
+.school-row{display:flex;align-items:center;gap:10px;padding:0 12px;background:var(--panel);border:1px solid var(--border);border-radius:11px;font-size:22px;flex:1;transition:transform .6s cubic-bezier(.2,.8,.3,1),background .4s,border-color .4s,color .4s}
+.school-row.lead{color:#fff;border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.18),var(--panel2))}
+.school-row.lead .nm{color:var(--gold-bright);font-weight:700}
+/* active = the participant currently answering (stage 2) — distinct blue, wins over gold */
+.school-row.active{border-color:#37b0ef;background:linear-gradient(90deg,rgba(47,159,214,.34),var(--panel2));box-shadow:0 0 0 2px rgba(55,176,239,.65),0 0 22px rgba(55,176,239,.5)}
+.school-row.active .nm{color:#bfe6ff;font-weight:700}
+.school-row.active .sc{color:#bfe6ff}
+.school-row .rank{width:22px;color:var(--muted);font-size:14px;font-weight:700;text-align:center;flex-shrink:0}
+.school-row.lead .rank{color:var(--gold-bright)}
+.school-row .nm{flex:1;overflow:hidden;font-family:'Frank Ruhl Libre',serif;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.school-row .sc{font-variant-numeric:tabular-nums;font-weight:900;color:var(--gold-bright);min-width:48px;text-align:left;flex-shrink:0;font-size:29px}
+.school-row.bump{animation:rowRise 1s cubic-bezier(.2,.9,.3,1)}
+@keyframes rowRise{0%{transform:scale(1)}35%{transform:scale(1.12);background:rgba(245,215,110,.35);z-index:5}100%{transform:scale(1)}}
+/* FX */
+.fx-layer{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
+.confetti{position:absolute;width:11px;height:15px;will-change:transform}
+.flyname{position:fixed;bottom:60px;font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:28px;color:#fff8e6;background:linear-gradient(135deg,#caa53c,#8f7220);padding:8px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(60,40,5,.35);text-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap;will-change:transform;z-index:10001}
+.bonus-pop{position:fixed;top:46%;left:50%;z-index:10000;pointer-events:none;font-family:'Frank Ruhl Libre',serif;font-weight:900;text-align:center;opacity:0}
+.bonus-pop.show{animation:bonusPop 2.4s cubic-bezier(.2,.9,.3,1) forwards}
+@keyframes bonusPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-95%) scale(1)}}
+.bonus-pop .big{font-size:96px;color:var(--gold-bright);text-shadow:0 0 44px rgba(245,215,110,.6)}
+.bonus-pop .cap{font-size:30px;color:var(--text)}
+.s2-video{width:min(880px,84%);aspect-ratio:16/9;border-radius:18px;border:2px solid var(--gold-deep);background:#000;box-shadow:0 0 60px rgba(212,175,55,.15);cursor:pointer;object-fit:contain}
+.media-cap{color:var(--gold-deep);font-size:22px;margin-top:16px;font-family:'Frank Ruhl Libre',serif;z-index:1}
+/* per-stage meter: purple after the 400 milestone */
+.meter-fill.purple{background:linear-gradient(180deg,#c084fc,#7c3aed)}
+.meter-fill.purple::after{background:rgba(255,255,255,.45)}
+/* exact-score flag riding the top of the fill */
+.meter-flag{position:absolute;left:50%;transform:translate(-50%,50%);background:linear-gradient(135deg,#fff6d5,#f3cf57);color:#3a2c05;font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:28px;line-height:1;padding:6px 10px;border-radius:9px;border:2px solid var(--gold-bright);box-shadow:0 3px 12px rgba(0,0,0,.45);z-index:5;white-space:nowrap;transition:bottom 1.1s cubic-bezier(.3,1,.4,1)}
+.meter-flag::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:9px solid #f3cf57}
+.meter-flag.purple{background:linear-gradient(135deg,#efd6ff,#c084fc);border-color:#c084fc;color:#2c0f47}
+.meter-flag.purple::after{border-top-color:#c084fc}
+/* stage-1 timer */
+.timer{font-family:'Frank Ruhl Libre',serif;font-weight:900;color:var(--gold-bright);font-variant-numeric:tabular-nums}
+.timer.big{font-size:64px;margin:6px 0 16px;text-shadow:0 0 34px rgba(245,215,110,.45)}
+.timer.small{font-size:20px;padding:5px 12px;border:1px solid var(--gold-deep);border-radius:10px}
+.timer.idle{color:var(--muted)}
+.timer.urgent{color:var(--bad);animation:timerPulse .6s ease infinite}
+.timer.done{color:var(--bad)}
+@keyframes timerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+/* stage-2 active participant card (the one answering) — blue, distinct */
+.score-card.active-card{border-color:#37b0ef;background:rgba(47,159,214,.14);box-shadow:inset 0 0 0 2px #37b0ef}
+/* compact stage-2 control panel so it fits without scrolling */
+.s2-host .panel{padding:14px 16px;margin-bottom:12px}
+.s2-host .hint{margin-top:6px;line-height:1.4}
+.s2-host .opt{padding:7px 11px;font-size:13px}
+.s2-grid{gap:8px}
+.s2-host .score-card{padding:6px 11px}
+.s2-host .score-card .nm{font-size:13px;line-height:1.2}
+.s2-host .score-card .nm small{font-size:10px}
+.s2-host .score-card .sc{min-width:34px;font-size:15px}
+.s2-host .score-card .btns button{padding:6px 12px;font-size:15px}
+/* ---- fixed photo background per stage (stages 1/3/4) ----
+   The light scrim is baked into the background image layers (set inline in
+   Display.jsx) so the stage-area stays the positioning context for the timer. */
+.stage-area.has-bg{background-size:cover;background-position:center;background-repeat:no-repeat}
+/* stage-4 big title block */
+.d-rav-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;color:#7c3aed;
+  font-size:80px;line-height:1.2;text-shadow:0 2px 18px rgba(124,58,237,.25);max-width:1100px}
+.d-rav-sub{font-family:'Frank Ruhl Libre',serif;font-weight:700;color:#3a3450;font-size:40px;margin-top:18px}
+/* ---- glass-ceiling: full-screen purple celebration (~10s, JS-removed) ---- */
+.purple-celebration{position:fixed;inset:0;z-index:10002;pointer-events:none;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  background:radial-gradient(circle at 50% 42%,rgba(168,85,247,.55),rgba(91,33,182,.78));
+  animation:pcFlash .9s ease-in-out infinite}
+@keyframes pcFlash{0%,100%{opacity:.5}50%{opacity:.94}}
+.pc-emojis{font-size:96px;letter-spacing:14px;animation:pcDance .8s ease-in-out infinite}
+@keyframes pcDance{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-26px) rotate(5deg)}}
+.pc-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:88px;color:#fff;text-shadow:0 0 44px rgba(216,180,254,.95)}
+.pc-sub{font-size:40px;color:#f3e8ff;font-weight:700}
+/* ---- display screensaver (host-controlled) ---- */
+.screensaver{position:fixed;inset:0;z-index:10003;background:#070a14 center/cover no-repeat;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;cursor:none}
+.screensaver::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(7,10,20,.82))}
+.screensaver .ss-title{position:relative;z-index:1;font-family:'Frank Ruhl Libre',serif;font-weight:900;
+  font-size:96px;color:var(--gold-bright);text-shadow:0 0 50px rgba(245,215,110,.6);animation:ssGlow 4s ease-in-out infinite}
+.screensaver .ss-sub{position:relative;z-index:1;color:var(--gold);font-size:34px;font-family:'Frank Ruhl Libre',serif}
+@keyframes ssGlow{0%,100%{opacity:.78;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+/* ---- finale celebration screen ---- */
+.finale{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:26px;padding:50px;text-align:center;overflow:hidden;
+  background:radial-gradient(ellipse at top,#1c2748 0%,transparent 55%),radial-gradient(ellipse at bottom,#241a3f 0%,transparent 55%),var(--bg)}
+.finale .menorah{font-size:120px;filter:drop-shadow(0 0 40px rgba(245,215,110,.85));animation:ssGlow 3s ease-in-out infinite}
+.finale .fin-pasuk{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:64px;color:var(--gold-bright);
+  text-shadow:0 0 36px rgba(245,215,110,.45);max-width:1200px;line-height:1.3}
+.finale .fin-grand-lbl{color:var(--gold);font-size:30px;font-weight:700;letter-spacing:2px}
+.finale .fin-grand{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:150px;color:#fff8e6;
+  line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 0 60px rgba(245,215,110,.6)}
+.finale .fin-top-title{color:var(--gold);font-size:28px;font-weight:700;margin-top:10px}
+.finale .fin-podium{display:flex;gap:22px;align-items:flex-end;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.finale .fin-place{background:var(--panel);border:2px solid var(--gold-deep);border-radius:16px;padding:22px 26px;min-width:240px}
+.finale .fin-place.first{border-color:var(--gold-bright);transform:scale(1.12);box-shadow:0 0 40px rgba(245,215,110,.4)}
+.finale .fin-medal{font-size:50px}
+.finale .fin-name{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:30px;color:var(--gold-bright);margin-top:8px}
+.finale .fin-score{font-size:40px;font-weight:900;color:#fff8e6;font-variant-numeric:tabular-nums;margin-top:6px}

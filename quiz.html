@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>חידון בית תפארתנו</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@400;500;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+:root{--bg:#0a0e1a;--bg2:#111729;--panel:#161d33;--panel2:#1d2640;--border:#2a3656;--text:#f0ece0;--muted:#8b93ad;--gold:#d4af37;--gold-bright:#f5d76e;--gold-deep:#9a7b1f;--ok:#4ade80;--bad:#f87171}
+body{font-family:'Heebo',sans-serif;background:radial-gradient(ellipse at top,#16203a 0%,transparent 55%),radial-gradient(ellipse at bottom right,#1a1530 0%,transparent 50%),var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3{font-family:'Frank Ruhl Libre',serif}
+#landing{max-width:560px;margin:70px auto;text-align:center;padding:24px}
+#landing h1{font-size:40px;color:var(--gold-bright);letter-spacing:1px;margin-bottom:6px}
+#landing .sub{color:var(--gold);font-size:16px;margin-bottom:8px}
+#landing p{color:var(--muted);margin-bottom:36px;font-size:14px;line-height:1.6}
+.links{display:flex;gap:16px}
+.links a{flex:1;padding:28px 20px;background:var(--panel);border:1px solid var(--border);border-radius:14px;color:var(--text);text-decoration:none;transition:all .18s}
+.links a:hover{border-color:var(--gold);transform:translateY(-2px)}
+.links a strong{display:block;font-size:20px;margin-bottom:6px;color:var(--gold-bright)}
+.links a span{font-size:13px;color:var(--muted)}
+.view{display:none}.view.active{display:block}
+#host{max-width:1140px;margin:0 auto;padding:24px}
+.host-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 20px;background:var(--panel);border:1px solid var(--border);border-radius:14px;margin-bottom:20px}
+.host-bar .title{font-family:'Frank Ruhl Libre',serif;font-size:20px;color:var(--gold-bright);margin-left:auto}
+.stage-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.stage-tabs button{font-size:13px;padding:8px 14px}
+.stage-tabs button.on{background:var(--gold-deep);border-color:var(--gold);color:#fff}
+.toggles{display:flex;gap:18px;align-items:center}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none}
+.switch{width:40px;height:22px;background:var(--border);border-radius:99px;position:relative;transition:background .2s;flex-shrink:0}
+.switch::after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on .switch{background:var(--ok)}
+.toggle.on .switch::after{transform:translateX(-18px)}
+button{font-family:'Heebo',sans-serif;font-size:15px;padding:11px 18px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);color:var(--text);cursor:pointer;transition:all .15s}
+button:hover:not(:disabled){border-color:var(--gold)}
+button:disabled{opacity:.35;cursor:default}
+button.primary{background:linear-gradient(135deg,var(--gold),var(--gold-deep));border-color:var(--gold);color:#1a1505;font-weight:700}
+button.ghost{background:transparent}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px}
+.panel h3{font-size:15px;color:var(--gold);margin-bottom:14px;font-weight:700}
+.q-num{color:var(--muted);font-size:13px}
+.q-text{font-family:'Frank Ruhl Libre',serif;font-size:22px;margin:8px 0 16px;line-height:1.4}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+#host .options{display:grid;gap:8px;max-width:660px}
+#host .opt{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1px solid var(--border);border-radius:9px;background:var(--panel2);font-size:14px}
+#host .opt .letter{width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--border);font-weight:700;font-size:13px}
+#host .opt.correct{border-color:var(--ok);background:rgba(74,222,128,.12)}
+#host .opt.correct .letter{background:var(--ok);color:#06210f}
+.score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.score-card{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px}
+.score-card .nm{flex:1;font-size:13px;line-height:1.3}
+.score-card .nm small{color:var(--muted);font-size:11px;display:block}
+.score-card .sc{font-variant-numeric:tabular-nums;min-width:46px;text-align:center;font-weight:700;color:var(--gold-bright)}
+.score-card.maxed{border-color:var(--ok)}
+.score-card.maxed .sc{color:var(--ok)}
+.score-card .btns{display:flex;gap:4px}
+.score-card .btns button{padding:5px 9px;font-size:13px}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper input{width:60px;padding:7px;text-align:center;font-size:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text)}
+select{padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Heebo';font-size:14px;max-width:100%}
+.pill{display:inline-block;font-size:12px;color:var(--gold);border:1px solid var(--gold-deep);padding:3px 10px;border-radius:99px}
+.hint{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}
+.combo-status{font-size:13px;color:var(--gold-bright);margin-top:8px}
+details{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}
+details summary{cursor:pointer;color:var(--gold);font-size:14px;padding:4px 0;user-select:none}
+.edit-row{padding:10px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:var(--panel2)}
+.edit-row label{font-size:12px;color:var(--muted);display:block;margin-top:6px}
+.edit-row textarea,.edit-row input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Heebo';font-size:13px;padding:7px;margin-top:3px;resize:vertical}
+/* DISPLAY */
+#display{display:none}
+#display.active{display:grid;grid-template-columns:1fr 320px;min-height:100vh}
+.stage-area{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;text-align:center;min-height:100vh;position:relative}
+.stage-badge{position:absolute;top:36px;right:50px}
+.stage-badge .pill{font-size:15px;padding:6px 16px}
+.d-num{color:var(--gold);font-size:20px;margin-bottom:18px;letter-spacing:1px}
+.d-text{font-family:'Frank Ruhl Libre',serif;font-size:46px;line-height:1.3;max-width:1000px;margin-bottom:8px}
+.d-idle{color:var(--muted);font-size:30px;font-family:'Frank Ruhl Libre',serif}
+.d-active-player{color:var(--gold-bright);font-size:26px;margin-bottom:6px}
+.d-active-sub{color:var(--muted);font-size:17px;margin-bottom:24px}
+#display .options{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:920px;width:100%;margin-top:28px}
+#display .opt{display:flex;align-items:center;gap:16px;padding:22px;border:1px solid var(--border);border-radius:14px;background:var(--panel);font-size:26px;text-align:right;opacity:0;animation:optFade .9s ease forwards}
+#display .opt:nth-child(1){animation-delay:.15s}
+#display .opt:nth-child(2){animation-delay:.65s}
+#display .opt:nth-child(3){animation-delay:1.15s}
+#display .opt:nth-child(4){animation-delay:1.65s}
+#display .opt .letter{width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:11px;background:var(--border);font-weight:700;font-size:22px}
+@keyframes optFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.media-box{width:min(840px,82%);aspect-ratio:16/9;border-radius:18px;border:2px solid var(--gold-deep);background:linear-gradient(135deg,#14101f,#1a2238);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;box-shadow:0 0 60px rgba(212,175,55,.12)}
+.media-box .icon{font-size:64px}
+.media-box .label{color:var(--gold);font-size:22px}
+.media-box .ph{color:var(--muted);font-size:14px}
+.q-list{display:flex;flex-direction:column;gap:14px;max-width:900px;width:100%;margin-top:24px}
+.q-item{display:flex;align-items:center;gap:16px;padding:20px 26px;border:1px solid var(--border);border-radius:14px;background:var(--panel);font-size:26px;text-align:right;opacity:0;animation:optFade 1s ease forwards}
+.q-item:nth-child(1){animation-delay:.2s}
+.q-item:nth-child(2){animation-delay:1.1s}
+.q-item:nth-child(3){animation-delay:2.0s}
+.q-item:nth-child(4){animation-delay:2.9s}
+.q-item .num{width:42px;height:42px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--gold-deep);color:#fff;font-weight:700;font-size:20px}
+@keyframes fadeOut{to{opacity:0;transform:scale(.85);height:0;margin:0;padding:0;border:0}}
+@keyframes heroIn{0%{opacity:0;transform:scale(.6)}60%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+#display .opt.fade{animation:fadeOut .4s ease forwards}
+.hero{display:flex;align-items:center;gap:22px;padding:34px 52px;border:2px solid var(--ok);border-radius:20px;background:rgba(74,222,128,.1);font-family:'Frank Ruhl Libre',serif;font-size:42px;font-weight:700;animation:heroIn .6s cubic-bezier(.2,.8,.3,1) .3s both;box-shadow:0 0 70px rgba(74,222,128,.25);margin-top:28px}
+.hero .letter{width:66px;height:66px;font-size:34px;background:var(--ok);color:#06210f;display:flex;align-items:center;justify-content:center;border-radius:15px;flex-shrink:0}
+/* BANNER */
+.banner{background:linear-gradient(180deg,var(--bg2),var(--bg));border-right:1px solid var(--border);padding:18px 14px;display:grid;grid-template-columns:54px 1fr;gap:14px;height:100vh}
+.meter{background:var(--panel);border:1px solid var(--gold-deep);border-radius:14px;position:relative;overflow:hidden;height:100%}
+.meter-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,var(--gold-bright),var(--gold-deep));transition:height 1.1s cubic-bezier(.3,1,.4,1)}
+.meter-fill::after{content:'';position:absolute;top:0;left:0;right:0;height:16px;background:rgba(255,255,255,.4);filter:blur(4px)}
+.meter-total{position:absolute;top:0;bottom:0;left:0;right:0;text-align:center;font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:12px;letter-spacing:2px;color:rgba(26,21,5,.7);writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none}
+.meter-mark{position:absolute;right:3px;font-size:9px;color:var(--text);display:flex;align-items:center;gap:3px;z-index:3;transform:translateY(50%);background:rgba(10,14,26,.55);padding:1px 3px;border-radius:4px}
+.meter-mark .dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--gold-deep);background:var(--bg)}
+.meter-mark.hit .dot{background:var(--gold-bright);border-color:var(--gold-bright);box-shadow:0 0 8px var(--gold-bright)}
+@keyframes ceilBreak{0%{transform:translateY(50%) scale(1)}30%{transform:translateY(50%) scale(1.5);filter:brightness(2)}100%{transform:translateY(50%) scale(1)}}
+.meter-mark.breaking{animation:ceilBreak .9s ease}
+.right-col{display:flex;flex-direction:column;gap:10px;min-height:0}
+.total-box{text-align:center;padding:10px;background:var(--panel);border:1px solid var(--gold-deep);border-radius:12px;flex-shrink:0}
+.total-box .lbl{font-size:11px;color:var(--gold)}
+.total-box .val{font-family:'Frank Ruhl Libre',serif;font-size:30px;font-weight:900;color:var(--gold-bright);font-variant-numeric:tabular-nums;line-height:1.1}
+.total-box.flash{animation:flashGold .8s ease}
+@keyframes flashGold{0%,100%{box-shadow:0 0 0 rgba(245,215,110,0)}50%{box-shadow:0 0 36px rgba(245,215,110,.7);border-color:var(--gold-bright)}}
+.schools{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;justify-content:space-between}
+.school-row{display:flex;align-items:center;gap:9px;padding:0 12px;background:var(--panel);border:1px solid var(--border);border-radius:11px;font-size:18px;flex:1;transition:transform .6s cubic-bezier(.2,.8,.3,1),background .4s,border-color .4s,color .4s}
+.school-row.active{border-color:var(--gold);background:var(--panel2)}
+.school-row.lead{color:#fff;border-color:var(--gold);background:linear-gradient(90deg,rgba(212,175,55,.18),var(--panel2))}
+.school-row.lead .nm{color:var(--gold-bright);font-weight:700}
+.school-row .rank{width:22px;color:var(--muted);font-size:14px;font-weight:700;text-align:center;flex-shrink:0}
+.school-row.lead .rank{color:var(--gold-bright)}
+.school-row .nm{flex:1;overflow:hidden;font-family:'Frank Ruhl Libre',serif;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.school-row .sc{font-variant-numeric:tabular-nums;font-weight:900;color:var(--gold-bright);min-width:40px;text-align:left;flex-shrink:0;font-size:22px}
+.school-row.bump{animation:rowRise 1s cubic-bezier(.2,.9,.3,1)}
+@keyframes rowRise{0%{transform:scale(1)}35%{transform:scale(1.12);background:rgba(245,215,110,.35);z-index:5}100%{transform:scale(1)}}
+/* FX */
+.fx-layer{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
+.confetti{position:absolute;width:11px;height:15px;will-change:transform}
+.flyname{position:fixed;bottom:60px;font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:24px;color:var(--gold-bright);text-shadow:0 2px 12px rgba(0,0,0,.6);white-space:nowrap;will-change:transform;z-index:10001}
+.bonus-pop{position:fixed;top:46%;left:50%;z-index:10000;pointer-events:none;font-family:'Frank Ruhl Libre',serif;font-weight:900;text-align:center;opacity:0}
+.bonus-pop.show{animation:bonusPop 2.4s cubic-bezier(.2,.9,.3,1) forwards}
+@keyframes bonusPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}75%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-95%) scale(1)}}
+.bonus-pop .big{font-size:96px;color:var(--gold-bright);text-shadow:0 0 44px rgba(245,215,110,.6)}
+.bonus-pop .cap{font-size:30px;color:var(--text)}
+.s2-video{width:min(880px,84%);aspect-ratio:16/9;border-radius:18px;border:2px solid var(--gold-deep);background:#000;box-shadow:0 0 60px rgba(212,175,55,.15);cursor:pointer;object-fit:contain}
+.media-cap{color:var(--gold);font-size:22px;margin-top:16px;font-family:'Frank Ruhl Libre',serif}
+
+
+</style>
+</head>
+<body>
+
+<div class="fx-layer" id="fx"></div>
+<div id="landing">
+  <div class="sub">&#9670; &#9670; &#9670;</div>
+  <h1>חידון בית תפארתנו</h1>
+  <div class="sub">חידון הסיום &middot; ידע המקדש</div>
+  <p>פותחים את תצוגת המנחה במחשב, וגוררים את תצוגת ההקרנה למסך/מקרן השני.<br>שתי התצוגות מסונכרנות אוטומטית.</p>
+  <div class="links">
+    <a href="#host"><strong>מסך מנחה</strong><span>שליטה, ניקוד וניהול</span></a>
+    <a href="#display" target="_blank"><strong>מסך הקרנה</strong><span>לקהל / מקרן</span></a>
+  </div>
+</div>
+<div id="host" class="view">
+  <div class="host-bar">
+    <div class="stage-tabs" id="stageTabs"></div>
+    <div class="toggles">
+      <div class="toggle" id="tgl-ceiling"><span class="switch"></span> תקרת זכוכית</div>
+      <div class="toggle" id="tgl-combo"><span class="switch"></span> קומבו</div>
+    </div>
+    <div class="title">בית תפארתנו</div>
+  </div>
+  <div id="hostStage"></div>
+</div>
+<div id="display" class="view">
+  <div class="stage-area" id="d-stage">
+    <div class="stage-badge"><span class="pill" id="d-badge"></span></div>
+    <div id="d-content"></div>
+  </div>
+  <aside class="banner" id="banner"></aside>
+</div>
+
+<script>
+// ============ DATA (real content from presentation) ============
+const SCHOOLS = [
+  { school:"תתמ\"ד אור לציון — כוכב יעקב", player:"איתי תמים" },
+  { school:"ת\"ת בני יוסף — שדרות", player:"הלל דויטש" },
+  { school:"תורני הראל — בית שמש", player:"אריאל בן-חמו" },
+  { school:"נועם חיים — דימונה", player:"ארבל דוד אפשטיין" },
+  { school:"אורות רש\"י — נתניה", player:"עמנואל סולקיס וידידיה יוליוס" },
+  { school:"אורות בנים — בית שמש", player:"עזריאל גולדמן" },
+  { school:"ת\"ת מצפה יריחו", player:"נריה יעקבסון" },
+  { school:"ת\"ת רמלה", player:"אוהד לוי" },
+  { school:"ת\"ת זמרת הארץ — ישוב עמיחי", player:"לב ארי יהודה יצהרי" },
+];
+
+// שלב א' — 10 אמריקאיות (correct = index)
+const STAGE1 = [
+  { text:"מתי הסתיימה מלאכת עשיית המשכן, ומתי הסתיימה חנוכתו?",
+    options:["הסתיימה בראש חודש ניסן, ובאותו יום עשו את חנוכת המשכן","הסתיימה שנה בדיוק לאחר מעמד הר סיני, ובאותו יום הייתה חנוכת המשכן","הסתיימה בחנוכה וחנוכת המשכן בראש חודש ניסן","הסתיימה בראש חודש ניסן וחנוכתו הייתה שנה שלמה אחרי"], correct:0 },
+  { text:"מתי התגלה לדוד המלך המקום המדויק שבו יש לבנות את המקדש?",
+    options:["בסוף ימיו לאחר מגפה קשה בעם","מיד לאחר ששמואל המליך אותו","כבר כשהיה צעיר","מיד לאחר שנולד שלמה בנו"], correct:0 },
+  { text:"מה קרה בזמן חנוכת המקדש שבנה שלמה?",
+    options:["ירדו גשמי ברכה מן השמיים","ה' דיבר לעיני כל העם","יצאו מים רבים מקודש הקודשים","ירדה אש מן השמים"], correct:3 },
+  { text:"למה שימשו ה\"מכונות\" שבנה שלמה המלך?",
+    options:["שימשו לקרר את בשר הקרבנות, שלא יסריח","שימשו בסיסים למנורות שהיו במקדש","כדי לשאוב את המים מבור עמוק שהיה בחצר","לקידוש ידיים ורגלים, הדחת קרבנות ועוד"], correct:3 },
+  { text:"בכמה מקומות היו שומרים במקדש?",
+    options:["16","24","36","10"], correct:1 },
+  { text:"היכן נמצאת \"עזרת הנשים\" ולמי מותר להיכנס לתוכה?",
+    options:["בצד מזרח, ומותר גם לנשים וגם לגברים להיכנס","בצד מזרח, ורק לנשים מותר להיכנס לתוכה","בצד מערב, ורק לנשים מותר להיכנס","בצמוד לעזרת כהנים, ורק לנשים מותר להיכנס"], correct:0 },
+  { text:"מאיזה עצים משתמשים למערכות שעל המזבח?",
+    options:["עצי ארז, כי זהו עץ הכי משובח וחזק","עצי תאנה ועצי אגוז, כי הם המשובחים ביותר","עצי זית, כי הם מלאים בשמן, וזה טוב לאש","מכל עץ, העיקר שלא יהיו בו תולעים"], correct:3 },
+  { text:"האם מותר למישהו שאינו כהן להיכנס לעזרת כהנים?",
+    options:["בדרך כלל אסור, אבל לדברים מיוחדים, מותר","מותר, בתנאי שקיבל אישור מיוחד מהסנהדרין","אסור תמיד!","מותר, בתנאי שטבל והוא טהור"], correct:0 },
+  { text:"למה רצה הגוי שפנה לשמאי הזקן להתגייר?",
+    options:["להביא קרבן חטאת על כל חטאיו","שימנו אותו להיות כהן גדול","כדי להיות כהן הדיוט ולעבוד בבית המקדש","להיות לוי ולשיר בבית המקדש"], correct:1 },
+  { text:"מי ומתי החביא את ארון הברית, מחשש שמא יגנבו אותו הגויים?",
+    options:["רבן יוחנן בן זכאי, בסוף ימי בית שני","המכבים, בתחילת בית שני, אחרי שניצחו את היוונים","יאשיהו המלך, בסוף בית המקדש הראשון","שלמה המלך, לפני שמת"], correct:2 },
+];
+
+// שלב ב' — 10 מדיות (סרטונים), 3 שאלות לכל אחת (2 מהמצגת + 1 מומצאת)
+const STAGE2 = [
+  { media:"סרטון — ניסוך היין והשמן", video:"media/video1.mp4", questions:[
+    "איפה שמרו את היין לניסוך היין?","למה שימש השמן?","היכן על המזבח ניסכו את היין?"] },
+  { media:"סרטון — לחם הפנים", video:"media/video2.mp4", questions:[
+    "איפה הייתה לשכת עושי לחם הפנים?","מתי היו אופים את לחם הפנים? ומתי היו שמים אותו על השולחן?","כמה לחמים היו על שולחן לחם הפנים?"] },
+  { media:"סרטון — עצי המערכה", video:"media/video3.mp4", questions:[
+    "באיזה עצים אסור להשתמש למזבח?","כמה עצים צריך להוסיף למזבח כל יום?","מי היה אחראי על אספקת העצים למזבח?"] },
+  { media:"סרטון — הקטורת ולשכת בית אבטינס", video:"media/video4.mp4", questions:[
+    "כמה פעמים בשנה היו מכינים קטורת? מתי?","באיזה צד של העזרה הייתה ממוקמת לשכת בית אבטינס?","כמה סממנים היו בקטורת?"] },
+  { media:"סרטון — העזרה וכליה", video:"media/video5.mp4", questions:[
+    "מה הפריד בין עזרת ישראל לעזרת כהנים?","איזה כלים היו בעזרה?","כמה מעלות היו בין עזרת ישראל לעזרת כהנים?"] },
+  { media:"סרטון — שירת הלווים", video:"media/video6.mp4", questions:[
+    "למי התפקיד לשיר ולנגן בבית המקדש?","מהם כלי הנגינה שבהם ניגנו בבית המקדש?","היכן עמדו הלווים בזמן השירה?"] },
+  { media:"סרטון — בית המוקד", video:"media/video7.mp4", questions:[
+    "מהו המבנה בבית המקדש שיש בו מדורה?","למה הוא משמש?","היכן היו ישנים הכהנים בבית המוקד?"] },
+  { media:"סרטון 6 — הציווי לבנות את המשכן", video:"media/video8.mp4", questions:[
+    "מה עם ישראל תרם בשביל המשכן?","היכן הוקם המשכן מיד אחרי שעם ישראל נכנס לארץ?","מי היה האחראי הראשי על מלאכת המשכן?"] },
+  { media:"סרטון — אלקנה והמשכן בשילה", video:"media/video9.mp4", questions:[
+    "מה אלקנה היה עושה כדי למשוך את העם להגיע לשילה?","מה היה ההבדל בין המשכן במדבר למשכן בשילה?","כמה שנים עמד המשכן בשילה?"] },
+  { media:"סרטון — דוד ובניית המקדש", video:"media/video10.mp4", questions:[
+    "איזו מגילה העביר שמואל לדוד, ומה היה כתוב בה?","בנחלת איזה שבט נבנה בית המקדש?","מי קנה את מקום המקדש, וממי?"] },
+];
+
+// שלב ג' — שער הניצוץ: תמונות, 4 תת-שאלות (הזנה ידנית 0-50)
+const STAGE3 = [
+  { img:"עליה לרגל", qs:["מה האירוע שאנחנו רואים בתמונה?","מי יוצא מירושלים לקבל את פני העולים?","כיצד נקראות הערים בהם מתכנסים עולי הרגל לפני העלייה לירושלים?","השלם: \"קומו ונעלה ציון...\""] },
+  { img:"הבאת ביכורים", qs:["מה האנשים בתמונה עושים?","איך היו סוחבים את סל הביכורים?","השלם את השיר: \"ארוממך ה' כי דיליתני...\"","מה עושה אדם בסיום הבאת הביכורים?"] },
+  { img:"חנוכה", qs:["לאיזה חג קשורה התמונה?","ממה עשויה מנורת החשמונאים?","מתי חנכו את המזבח מחדש?","מה עשו היוונים לסורג?"] },
+  { img:"שמחת בית השואבה", qs:["הנשים בתמונה עומדות על מרפסות. מתי הן היו עושות את זה?","מתי מתקיים ניסוך המים?","היכן בדיוק נערכה שמחת בית השואבה?","איך מכנים את חג סוכות? (רמז: בהקשר למצוות שלו)"] },
+  { img:"עבודת יום הכיפורים", qs:["מה הכהנים עושים בתמונה?","לשם מה נכנס הכהן הגדול לקודש הקודשים בפעם הרביעית?","כמה זמן מתכונן הכהן הגדול ליום כיפור?","כמה פעמים נכנס הכהן הגדול לקודש הקודשים ביום כיפור?"] },
+  { img:"חג השבועות — שתי הלחם", qs:["מהן שתי המצוות שיש בחג השבועות?","מה מבין המצוות שציינת מופיע בתמונה?","מה מותר לעשות אחרי הבאת שתי הלחם?","מה הייחודיות של קרבן שתי הלחם על פני מנחות הציבור האחרות?"] },
+  { img:"קרבן העומר", qs:["מנה את ארבעת השלבים של קרבן העומר.","מה מבין השלבים שציינת מופיע בתמונה?","כיצד נקרא הכלי בעזרתו קלו את גרעיני השעורים?","מה מותר לעשות אחרי הקרבת קרבן העומר?"] },
+  { img:"קרבן פסח", qs:["איזה שער מופיע מאחורי הלווים בתמונה?","מה עשו הלווים בזמן הקרבת קרבן פסח?","היכן צולים את קרבן פסח?","ממה עשוי השיפוד שצולים עליו את קרבן הפסח?"] },
+  { img:"כלי המקדש", qs:["מהו הכלי היוצא דופן מבין הכלים בתמונה?","מהם הקישוטים של המנורה?","ממה עשוי שולחן לחם הפנים?","כמה פעמים מקטירים קטורת בבית המקדש? מתי?"] },
+  { img:"מבנה בית המקדש", qs:["איך קוראים לחלק המסומן באדום בתמונה?","איך קראו לקוצים של גג בית המקדש?","איך נקרא הרווח שבין שתי הפרוכות בקצה הקודש?","מהו השימוש של העלייה בבית המקדש?"] },
+  { img:"עבודת התמיד", qs:["מה עושה הכהן בתמונה?","כיצד נקרא הקרבן שמקריב הכהן כל יום?","כמה פעמים עורכים פיס כל יום?","מה שרים הלווים בכל יום בבית המקדש?"] },
+  { img:"בגדי כהונה", qs:["כיצד נקרא הבגד הצבעוני המופיע בתמונה?","מדוע קוראים לבגדי הכהן הגדול \"בגדי זהב\"?","מה כתוב על הציץ?","מהם שני סוגי הקישוטים בקצה המעיל?"] },
+];
+
+// שלב ד' — שאלות פתוחות (הזנה ידנית 0-60)
+const STAGE4 = [
+  "כמה שערים היו ממערב למקדש, ומה היה גודלם?",
+  "מי קבע את מספר משמרות הכהונה, וכיצד?",
+  "לאיזה כלי בבית המקדש היו מדרגות, ולאיזה כלי אסור היה לעלות במדרגות?",
+  "מהן 3 האבנים היקרות שבטור הרביעי של החושן?",
+  "מה שמו של הממונה במקדש על בריאות הכהנים?",
+  "מי האחראי על שירת הלווים?",
+  "כמה לשכות יש בעזרת הנשים, ומהם שמותיהן?",
+  "מי מבין משפחות מביאי קרבן העצים מביא ביום ה' באב?",
+  "היכן ומתי היו הלווים שרים בבית המקדש את \"שיר של יום\"?",
+  "מי היו שומרים בבית המקדש ובהר הבית, ובכמה מקומות?",
+  "בכמה בגדים משמש הכהן הגדול, ומהם?",
+  "כמה לחמים יש בהיכל במקדש, ועל מה הם ערוכים?",
+  "מהם שני השערים של הר הבית הנקראים באותו שם?",
+  "ציין את שמות כל 24 משמרות הכהונה.",
+];
+
+
+
+// ============ CONFIG ============
+const POINTS={s1:5,s2:10,s3step:5,s3max:50,s4max:60};
+const S1_PER_Q=5;          // 5 per question
+const S2_CORRECT_MAX=3;    // 3 correct answers max per player
+const S2_PER_CORRECT=10;
+const CEILING_STEPS=[500,1000,1400,1750];
+const CEILING_BONUS=500, COMBO_BONUS=10;
+const CONFETTI_SLOW=true;
+
+// ============ STATE ============
+const KEY="templeQuizState";
+const channel=new BroadcastChannel("templeQuiz");
+function freshScores(){return SCHOOLS.map(()=>0);}
+function fresh2D(cols){return SCHOOLS.map(()=>Array(cols).fill(0));}
+const DEFAULT_STATE={
+  stage:1,
+  scores:{s1:freshScores(),s2:freshScores(),s3:freshScores(),s4:freshScores()},
+  s1_byQ:null,           // [player][question] = 0/5 ; built lazily
+  s2_correctCount:freshScores(),  // how many correct each player got in stage2
+  baseTotal:0,bonusTotal:0,manualBonus:0,ceilingHit:0,ceilingOn:true,comboOn:true,
+  s1_index:0,s1_revealed:0,
+  s2_player:0,s2_phase:"media",
+  s2_comboReached:0,
+  editS1:null,editS2:null,
+  fx:null
+};
+function loadState(){try{const r=localStorage.getItem(KEY);if(r)return Object.assign(structuredClone(DEFAULT_STATE),JSON.parse(r));}catch(e){console.warn(e);}return structuredClone(DEFAULT_STATE);}
+function saveState(s){localStorage.setItem(KEY,JSON.stringify(s));channel.postMessage({type:"sync"});}
+let state=loadState();
+function ensureByQ(){const n=s1Q().length;if(!state.s1_byQ||state.s1_byQ[0].length!==n){state.s1_byQ=SCHOOLS.map(()=>Array(n).fill(0));}}
+channel.onmessage=(e)=>{if(e.data.type==="sync"){state=loadState();render();maybeFx();}};
+window.addEventListener("storage",(e)=>{if(e.key===KEY){state=loadState();render();maybeFx();}});
+
+function s1Q(){return (state.editS1||STAGE1);}
+function s2Q(){return (state.editS2||STAGE2);}
+
+// ============ SCORING ============
+function playerTotal(i){return state.scores.s1[i]+state.scores.s2[i]+state.scores.s3[i]+state.scores.s4[i];}
+function recomputeBase(){let t=0;SCHOOLS.forEach((_,i)=>t+=playerTotal(i));state.baseTotal=t;}
+function grandTotal(){return state.baseTotal+state.bonusTotal+state.manualBonus;}
+function checkCeiling(){if(!state.ceilingOn)return null;let hit=null;while(state.ceilingHit<CEILING_STEPS.length&&state.baseTotal>=CEILING_STEPS[state.ceilingHit]){state.ceilingHit++;state.bonusTotal+=CEILING_BONUS;hit=state.ceilingHit;}return hit;}
+
+// ============ ACTIONS ============
+function setStage(n){state.stage=n;saveState(state);render();}
+function toggleSwitch(k){state[k]=!state[k];if(k==="ceilingOn")checkCeiling();saveState(state);render();}
+
+// --- STAGE 1: mark correct per-question, but banner updates ONLY on reveal ---
+function s1Toggle(i){
+  ensureByQ();const q=state.s1_index;
+  state.s1_byQ[i][q]=state.s1_byQ[i][q]?0:S1_PER_Q;
+  saveState(state);render();
+}
+function s1Next(){if(state.s1_index<s1Q().length-1){state.s1_index++;state.s1_revealed=0;saveState(state);render();}}
+function s1Prev(){if(state.s1_index>0){state.s1_index--;state.s1_revealed=0;saveState(state);render();}}
+function s1Reveal(){
+  ensureByQ();
+  state.s1_revealed=state.s1_revealed?0:1;
+  if(state.s1_revealed){
+    // commit this question's marks into the running s1 score, update banner + confetti + names
+    const q=state.s1_index;
+    let winners=[];
+    state.scores.s1=SCHOOLS.map((_,i)=>state.s1_byQ[i].reduce((a,b)=>a+b,0));
+    SCHOOLS.forEach((_,i)=>{if(state.s1_byQ[i][q]>0)winners.push(i);});
+    recomputeBase();const ceil=checkCeiling();
+    fireFx({type:"reveal1",winners:winners,ceilStep:ceil});
+  }
+  saveState(state);render();
+}
+
+// --- STAGE 2 ---
+function s2SetPlayer(i){state.s2_player=i;state.s2_phase="media";saveState(state);render();}
+function s2ShowMedia(){state.s2_phase="media";saveState(state);render();}
+function s2ShowQ(){state.s2_phase="questions";saveState(state);render();}
+function s2Correct(i){
+  if(state.s2_correctCount[i]>=S2_CORRECT_MAX)return; // guard: max 3
+  state.s2_correctCount[i]++;
+  state.scores.s2[i]=state.s2_correctCount[i]*S2_PER_CORRECT;
+  recomputeBase();const ceil=checkCeiling();
+  fireFx({type:"score2",schoolIdx:i,ceilStep:ceil});
+  evaluateCombo(); // auto-combo when two consecutive players hit 3/3
+  saveState(state);render();
+}
+function s2Undo(i){
+  if(state.s2_correctCount[i]<=0)return;
+  state.s2_correctCount[i]--;
+  state.scores.s2[i]=state.s2_correctCount[i]*S2_PER_CORRECT;
+  recomputeBase();checkCeiling();
+  evaluateCombo();
+  saveState(state);render(); // no confetti on undo
+}
+function evaluateCombo(){
+  // a player is "full" if they got all 3 correct
+  let pairs=0;
+  for(let i=0;i<SCHOOLS.length-1;i++){
+    if(state.s2_correctCount[i]>=S2_CORRECT_MAX && state.s2_correctCount[i+1]>=S2_CORRECT_MAX)pairs++;
+  }
+  if(state.comboOn&&pairs>state.s2_comboReached){
+    const g=pairs-state.s2_comboReached;state.bonusTotal+=g*COMBO_BONUS;
+    const ceil=checkCeiling();fireFx({type:"combo",amount:g*COMBO_BONUS,ceilStep:ceil});
+  }
+  state.s2_comboReached=pairs;
+}
+
+// --- STAGE 3/4 manual numeric ---
+function addScore(stageKey,i,delta,max){
+  const arr=state.scores[stageKey];const nv=Math.max(0,Math.min(max,arr[i]+delta));
+  if(nv===arr[i])return;arr[i]=nv;recomputeBase();const ceil=checkCeiling();
+  fireFx({type:ceil?"ceiling":"score",schoolIdx:i,ceilStep:ceil});saveState(state);render();
+}
+function setScore(stageKey,i,val,max){
+  const arr=state.scores[stageKey];let nv=Math.max(0,Math.min(max,parseInt(val,10)||0));
+  arr[i]=nv;recomputeBase();const ceil=checkCeiling();
+  fireFx({type:ceil?"ceiling":"score",schoolIdx:i,ceilStep:ceil});saveState(state);render();
+}
+
+// --- manual GENERAL bonus +/-10 ---
+function manualBonusAdd(d){
+  state.manualBonus=Math.max(-(state.baseTotal+state.bonusTotal),state.manualBonus+d);
+  if(d>0)fireFx({type:"score"});
+  saveState(state);render();
+}
+
+function resetAll(){if(confirm("לאפס את כל החידון? (כולל ניקוד ובונוסים)")){const e1=state.editS1,e2=state.editS2;state=structuredClone(DEFAULT_STATE);state.editS1=e1;state.editS2=e2;saveState(state);render();}}
+
+// editing
+function editS1(i,field,val,optIdx){if(!state.editS1)state.editS1=structuredClone(STAGE1);if(field==="text")state.editS1[i].text=val;else if(field==="opt")state.editS1[i].options[optIdx]=val;else if(field==="correct")state.editS1[i].correct=parseInt(val,10);saveState(state);}
+function editS2(i,field,val,qIdx){if(!state.editS2)state.editS2=structuredClone(STAGE2);if(field==="media")state.editS2[i].media=val;else if(field==="video")state.editS2[i].video=val;else if(field==="q")state.editS2[i].questions[qIdx]=val;saveState(state);}
+function resetEdits(){if(confirm("לשחזר את כל השאלות לטקסט המקורי?")){state.editS1=null;state.editS2=null;saveState(state);render();}}
+
+// ============ FX ============
+let fxSeq=0,lastFxId=null;
+function fireFx(p){fxSeq++;state.fx=Object.assign({id:Date.now()+"_"+fxSeq},p);}
+function maybeFx(){if(state.fx&&state.fx.id!==lastFxId){lastFxId=state.fx.id;runFx(state.fx);}}
+function runFx(fx){
+  if(currentRoute()!=="display")return;
+  // confetti+flash ONLY on: reveal1 (stage1 reveal), score2 (stage2 correct), combo, ceiling, manual general add
+  const fxTypes=["reveal1","score2","combo","ceiling","score"];
+  if(!fxTypes.includes(fx.type))return;
+  const tb=document.querySelector(".total-box");
+  if(tb){tb.classList.remove("flash");void tb.offsetWidth;tb.classList.add("flash");}
+  if(fx.type==="reveal1"){cannonConfetti();(fx.winners||[]).forEach((w,k)=>setTimeout(()=>flyName(w),k*350));}
+  else if(fx.type==="score2"){cannonConfetti();if(fx.schoolIdx!=null)flyName(fx.schoolIdx);}
+  else {cannonConfetti();}
+  if(fx.schoolIdx!=null)bumpRow(fx.schoolIdx);
+  if(fx.type==="combo")bonusPopup("+"+fx.amount,"קומבו! 🔥");
+  if(fx.ceilStep){bonusPopup("+"+CEILING_BONUS,"תקרת זכוכית נפרצה! ✨");breakMark(fx.ceilStep);}
+}
+function cannonConfetti(){
+  const fxl=document.getElementById("fx");
+  const colors=["#f5d76e","#d4af37","#9a7b1f","#fff6d5","#e8c252","#ffffff"];
+  const count=CONFETTI_SLOW?42:55;
+  for(let side=0;side<2;side++){
+    for(let i=0;i<count;i++){
+      const c=document.createElement("div");c.className="confetti";
+      c.style.left=(side===0?0:100)+"%";c.style.bottom="0%";
+      c.style.background=colors[Math.floor(Math.random()*colors.length)];
+      const angle=side===0?(-58-Math.random()*34):(-90-Math.random()*34);
+      const dist=320+Math.random()*520;const rad=angle*Math.PI/180;
+      const dx=Math.cos(rad)*dist*(side===0?1:-1);const dy=Math.sin(rad)*dist;
+      const dur=(CONFETTI_SLOW?3.0:1.8)+Math.random()*1.6;
+      c.animate([
+        {transform:"translate(0,0) rotate(0deg)",opacity:1},
+        {transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*540}deg)`,opacity:1,offset:.45},
+        {transform:`translate(${dx*1.15}px,${dy+window.innerHeight}px) rotate(${Math.random()*900}deg)`,opacity:0}
+      ],{duration:dur*1000,easing:"cubic-bezier(.25,.5,.4,1)"});
+      fxl.appendChild(c);setTimeout(()=>c.remove(),dur*1000+200);
+    }
+  }
+}
+function flyName(idx){
+  const fxl=document.getElementById("fx");const el=document.createElement("div");el.className="flyname";
+  const label=SCHOOLS[idx].player&&SCHOOLS[idx].player!=="—"?SCHOOLS[idx].player:SCHOOLS[idx].school;
+  el.textContent="✓ "+label;
+  const fromLeft=Math.random()<0.5;el.style.left=fromLeft?"-8%":"auto";el.style.right=fromLeft?"auto":"-8%";
+  fxl.appendChild(el);
+  const tx=fromLeft?window.innerWidth*0.92:-window.innerWidth*0.92;const ty=-(120+Math.random()*230);
+  el.animate([{transform:"translate(0,0)",opacity:0},{transform:`translate(${tx*0.15}px,${ty*0.5}px)`,opacity:1,offset:.25},{transform:`translate(${tx}px,${ty}px)`,opacity:0}],{duration:3400,easing:"cubic-bezier(.2,.5,.4,1)"});
+  setTimeout(()=>el.remove(),3500);
+}
+function bumpRow(idx){const r=document.querySelector(`.school-row[data-i="${idx}"]`);if(r){r.classList.remove("bump");void r.offsetWidth;r.classList.add("bump");}}
+function bonusPopup(big,cap){const fxl=document.getElementById("fx");const p=document.createElement("div");p.className="bonus-pop show";p.innerHTML=`<div class="big">${big}</div><div class="cap">${cap}</div>`;fxl.appendChild(p);setTimeout(()=>p.remove(),2600);}
+function breakMark(step){const m=document.querySelector(`.meter-mark[data-step="${step}"]`);if(m){m.classList.add("breaking");setTimeout(()=>m.classList.remove("breaking"),1000);}}
+function rollNumber(el,to){const from=parseInt(el.dataset.from||"0",10);if(from===to){el.textContent=to;return;}const dur=800,t0=performance.now();function tick(now){const p=Math.min(1,(now-t0)/dur);const e=1-Math.pow(1-p,3);el.textContent=Math.round(from+(to-from)*e);if(p<1)requestAnimationFrame(tick);else el.dataset.from=to;}el.dataset.from=to;requestAnimationFrame(tick);}
+
+// video fullscreen
+function playVideoFs(){
+  const v=document.getElementById("s2video");if(!v)return;
+  if(v.requestFullscreen)v.requestFullscreen();else if(v.webkitRequestFullscreen)v.webkitRequestFullscreen();
+  v.play();
+}
+
+// ============ ROUTING ============
+function currentRoute(){return (location.hash||"#landing").slice(1);}
+function routeTo(){const r=currentRoute();document.getElementById("landing").style.display=(r==="host"||r==="display")?"none":"block";document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));const el=document.getElementById(r);if(el&&el.classList.contains("view"))el.classList.add("active");render();}
+window.addEventListener("hashchange",routeTo);
+
+// ============ RENDER ============
+const LETTERS=["א","ב","ג","ד"];
+const STAGE_NAMES={1:"שלב א' — אמריקאיות",2:"שלב ב' — סרטונים",3:"שלב ג' — שער הניצוץ",4:"שלב ד' — שאלות מסכמות"};
+function esc(s){return (s+"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function render(){const r=currentRoute();if(r==="host")renderHost();if(r==="display")renderDisplay();}
+let hostTab="play"; // play | edit
+function setHostTab(t){hostTab=t;renderHost();}
+
+function renderHost(){
+  ensureByQ();
+  document.getElementById("stageTabs").innerHTML=
+    [1,2,3,4].map(n=>`<button class="${hostTab==='play'&&state.stage===n?'on':''}" onclick="setHostTab('play');setStage(${n})">${["","א","ב","ג","ד"][n]}</button>`).join("")
+    +`<button class="${hostTab==='edit'?'on':''}" onclick="setHostTab('edit')" style="margin-right:8px">✎ עריכה</button>`;
+  document.getElementById("tgl-ceiling").classList.toggle("on",state.ceilingOn);
+  document.getElementById("tgl-combo").classList.toggle("on",state.comboOn);
+  const h=document.getElementById("hostStage");
+  if(hostTab==="edit"){h.innerHTML=editTab();return;}
+  if(state.stage===1)h.innerHTML=hostS1();
+  else if(state.stage===2)h.innerHTML=hostS2();
+  else if(state.stage===3)h.innerHTML=hostS3();
+  else h.innerHTML=hostS4();
+}
+
+function generalBonusBar(){
+  return `<div class="panel" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <b style="color:var(--gold)">ניקוד כללי ידני:</b>
+    <span style="color:var(--muted);font-size:13px">בונוס נוכחי: ${state.manualBonus>=0?'+':''}${state.manualBonus}</span>
+    <div class="controls" style="margin:0">
+      <button onclick="manualBonusAdd(10)">+10 לכללי</button>
+      <button onclick="manualBonusAdd(-10)">−10 לכללי</button>
+    </div>
+  </div>`;
+}
+
+function hostS1(){
+  const Q=s1Q();const q=Q[state.s1_index];
+  const opts=q.options.map((o,i)=>{const ok=state.s1_revealed&&i===q.correct;return `<div class="opt${ok?' correct':''}"><span class="letter">${LETTERS[i]}</span><span>${esc(o)}</span></div>`;}).join("");
+  const qi=state.s1_index;
+  const cards=SCHOOLS.map((s,i)=>{
+    const on=state.s1_byQ[i][qi]>0;
+    return `<div class="score-card${on?' maxed':''}">
+      <span class="nm">${i+1}. ${esc(s.school)}<small>${esc(s.player)}</small></span>
+      <button class="${on?'primary':''}" onclick="s1Toggle(${i})">${on?'✓ נכון':'סמן נכון'}</button>
+    </div>`;
+  }).join("");
+  return `<div class="panel">
+    <span class="pill">${STAGE_NAMES[1]}</span>
+    <div class="q-num" style="margin-top:10px">שאלה ${state.s1_index+1} מתוך ${Q.length} &middot; 5 נק' לשאלה</div>
+    <div class="q-text">${esc(q.text)}</div>
+    <div class="options">${opts}</div>
+    <div class="hint">נכונה: ${LETTERS[q.correct]} — ${esc(q.options[q.correct])}</div>
+    <div class="controls">
+      <button onclick="s1Prev()" ${state.s1_index===0?'disabled':''}>◀ הקודמת</button>
+      <button class="${state.s1_revealed?'':'primary'}" onclick="s1Reveal()">${state.s1_revealed?'הסתר תשובה':'חשוף תשובה ▶'}</button>
+      <button onclick="s1Next()" ${state.s1_index>=Q.length-1?'disabled':''}>הבאה ▶</button>
+    </div>
+    <div class="hint">סמן מי ענה נכון. <b style="color:var(--gold-bright)">הניקוד, הקונפטי והעדכון בבאנר קורים רק בלחיצת "חשוף תשובה".</b></div>
+  </div>
+  <div class="panel"><h3>מי ענה נכון? <span style="color:var(--muted);font-weight:400">(5 נק' לשאלה זו)</span></h3>
+    <div class="score-grid">${cards}</div>
+    <div class="controls" style="margin-top:16px"><button class="ghost" onclick="resetAll()">איפוס ניקוד</button></div>
+  </div>
+  ${generalBonusBar()}`;
+}
+
+function hostS2(){
+  const Q=s2Q();const round=Q[state.s2_player];
+  const sel=SCHOOLS.map((s,i)=>`<option value="${i}" ${i===state.s2_player?'selected':''}>${i+1}. ${esc(s.school)}</option>`).join("");
+  const qs=round.questions.map((qq,i)=>`<div class="opt"><span class="letter">${i+1}</span><span>${esc(qq)}</span></div>`).join("");
+  const cards=SCHOOLS.map((s,i)=>{
+    const cc=state.s2_correctCount[i];const maxed=cc>=S2_CORRECT_MAX;
+    return `<div class="score-card${maxed?' maxed':''}">
+      <span class="nm">${i+1}. ${esc(s.school)}<small>${esc(s.player)} &middot; ${cc}/3 נכונות</small></span>
+      <span class="sc">${state.scores.s2[i]}</span>
+      <div class="btns">
+        <button onclick="s2Undo(${i})" ${cc<=0?'disabled':''}>↶</button>
+        <button class="primary" onclick="s2Correct(${i})" ${maxed?'disabled':''}>✓ נכון</button>
+      </div>
+    </div>`;
+  }).join("");
+  return `<div class="panel">
+    <span class="pill">${STAGE_NAMES[2]}</span>
+    <div style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:14px;color:var(--muted)">משתתף פעיל:</label>
+      <select onchange="s2SetPlayer(+this.value)">${sel}</select>
+      <span style="font-size:13px;color:var(--muted)">${esc(round.media)}</span>
+    </div>
+    <div class="controls" style="margin-top:16px">
+      <button class="${state.s2_phase==='media'?'primary':''}" onclick="s2ShowMedia()">▶ הצג מדיה לקהל</button>
+      <button class="${state.s2_phase==='questions'?'primary':''}" onclick="s2ShowQ()">הצג שאלות ▶</button>
+    </div>
+    <div style="margin-top:14px">${qs}</div>
+    <div class="combo-status">${state.comboOn?`קומבו אוטומטי: ${state.s2_comboReached} זוגות רצופים השלימו 3/3 &middot; בונוס ${state.s2_comboReached*COMBO_BONUS} נק'`:'קומבו כבוי'}</div>
+  </div>
+  <div class="panel"><h3>ניקוד שלב ב' <span style="color:var(--muted);font-weight:400">(10 נק' לכל נכונה &middot; עד 3 = 30)</span></h3>
+    <div class="hint" style="margin-top:-6px;margin-bottom:14px">"✓ נכון" = +10 וקונפטי. עד 3 פעמים למשתתף. הקומבו נדלק אוטומטית כששני משתתפים רצופים השלימו 3/3.</div>
+    <div class="score-grid">${cards}</div>
+    <div class="controls" style="margin-top:16px"><button class="ghost" onclick="resetAll()">איפוס ניקוד</button></div>
+  </div>
+  ${generalBonusBar()}`;
+}
+
+function hostS3(){
+  return `<div class="panel"><span class="pill">${STAGE_NAMES[3]}</span>
+    <div class="hint" style="margin-top:10px">שער הניצוץ — סבב תמונות (12 תמונות, 4 שאלות לכל אחת). הזן לכל משתתף ציון בקפיצות של 5 (0–50).</div>
+  </div>
+  ${scoreNumeric("s3",POINTS.s3step,POINTS.s3max)}
+  ${generalBonusBar()}`;
+}
+function hostS4(){
+  return `<div class="panel"><span class="pill">${STAGE_NAMES[4]}</span>
+    <div class="hint" style="margin-top:10px">שאלות מסכמות — הזן ניקוד ידני לכל משתתף (0–60).</div>
+  </div>
+  ${scoreNumeric("s4",5,POINTS.s4max)}
+  ${generalBonusBar()}`;
+}
+
+function scoreNumeric(stageKey,step,max){
+  const rows=SCHOOLS.map((s,i)=>{
+    const v=state.scores[stageKey][i];const maxed=v>=max;
+    return `<div class="score-card${maxed?' maxed':''}"><span class="nm">${i+1}. ${esc(s.school)}<small>${esc(s.player)}</small></span><span class="sc">${v}</span>
+      <div class="stepper">
+        <button onclick="addScore('${stageKey}',${i},-${step},${max})" ${v<=0?'disabled':''}>−</button>
+        <input type="number" value="${v}" step="${step}" min="0" max="${max}" onchange="setScore('${stageKey}',${i},this.value,${max})">
+        <button onclick="addScore('${stageKey}',${i},${step},${max})" ${maxed?'disabled':''}>+</button>
+      </div></div>`;
+  }).join("");
+  return `<div class="panel"><h3>ניקוד <span style="color:var(--muted);font-weight:400">(מקס' ${max} למשתתף)</span></h3>
+    <div class="score-grid">${rows}</div>
+    <div class="controls" style="margin-top:16px"><button class="ghost" onclick="resetAll()">איפוס ניקוד</button></div></div>`;
+}
+
+function editTab(){
+  const Q1=s1Q();const Q2=s2Q();
+  const r1=Q1.map((q,i)=>`<div class="edit-row">
+    <label>שאלה ${i+1} (שלב א')</label>
+    <textarea rows="2" onchange="editS1(${i},'text',this.value)">${esc(q.text)}</textarea>
+    ${q.options.map((o,j)=>`<label>אפשרות ${LETTERS[j]} ${j===q.correct?'✓ הנכונה':''}</label><input value="${esc(o)}" onchange="editS1(${i},'opt',this.value,${j})">`).join("")}
+    <label>אינדקס תשובה נכונה (0=א, 1=ב, 2=ג, 3=ד)</label><input type="number" min="0" max="3" value="${q.correct}" onchange="editS1(${i},'correct',this.value)">
+  </div>`).join("");
+  const r2=Q2.map((r,i)=>`<div class="edit-row">
+    <label>מדיה ${i+1} — כותרת</label><input value="${esc(r.media)}" onchange="editS2(${i},'media',this.value)">
+    <label>קובץ וידאו (נתיב יחסי)</label><input value="${esc(r.video||'')}" onchange="editS2(${i},'video',this.value)">
+    ${r.questions.map((q,j)=>`<label>שאלה ${j+1}</label><textarea rows="2" onchange="editS2(${i},'q',this.value,${j})">${esc(q)}</textarea>`).join("")}
+  </div>`).join("");
+  return `<div class="panel">
+    <h3>✎ עריכת שאלות</h3>
+    <div class="hint" style="margin-bottom:14px">השינויים נשמרים אוטומטית ומשתקפים במסך ההקרנה. שלבים ג'/ד' מנוהלים ידנית מהבמה ואינם נערכים כאן.</div>
+    <details open><summary>שלב א' — אמריקאיות (${Q1.length} שאלות)</summary><div style="margin-top:10px">${r1}</div></details>
+    <details><summary>שלב ב' — סרטונים (${Q2.length} מדיות)</summary><div style="margin-top:10px">${r2}</div></details>
+    <div class="controls" style="margin-top:16px"><button class="ghost" onclick="resetEdits()">שחזר טקסט מקורי</button></div>
+  </div>`;
+}
+
+// ---------- DISPLAY ----------
+function renderDisplay(){
+  document.getElementById("d-badge").textContent=STAGE_NAMES[state.stage];
+  const c=document.getElementById("d-content");
+  if(state.stage===1)c.innerHTML=dispS1();
+  else if(state.stage===2)c.innerHTML=dispS2();
+  else if(state.stage===3)c.innerHTML=dispS3();
+  else c.innerHTML=dispS4();
+  renderBanner();
+}
+function dispS1(){
+  const Q=s1Q();const q=Q[state.s1_index];
+  if(!state.s1_revealed){
+    const opts=q.options.map((o,i)=>`<div class="opt"><span class="letter">${LETTERS[i]}</span><span>${esc(o)}</span></div>`).join("");
+    return `<div class="d-num">שאלה ${state.s1_index+1} / ${Q.length}</div><div class="d-text">${esc(q.text)}</div><div class="options">${opts}</div>`;
+  }
+  const opts=q.options.map((o,i)=>i===q.correct?"":`<div class="opt fade"><span class="letter">${LETTERS[i]}</span><span>${esc(o)}</span></div>`).join("");
+  return `<div class="d-num">שאלה ${state.s1_index+1} / ${Q.length}</div><div class="d-text">${esc(q.text)}</div><div class="options">${opts}</div>
+    <div class="hero"><span class="letter">${LETTERS[q.correct]}</span><span>${esc(q.options[q.correct])}</span></div>`;
+}
+function dispS2(){
+  const Q=s2Q();const round=Q[state.s2_player];const s=SCHOOLS[state.s2_player];
+  if(state.s2_phase==="media"){
+    const v=round.video||"";
+    return `<div class="d-active-player">${esc(s.school)}</div><div class="d-active-sub">${esc(s.player)}</div>
+      <video id="s2video" class="s2-video" src="${esc(v)}" controls preload="metadata" onclick="playVideoFs()"></video>
+      <div class="media-cap">${esc(round.media)}</div>
+      <button class="primary" style="margin-top:18px" onclick="playVideoFs()">▶ נגן במסך מלא</button>`;
+  }
+  const qs=round.questions.map((qq,i)=>`<div class="q-item q-slow"><span class="num">${i+1}</span><span>${esc(qq)}</span></div>`).join("");
+  return `<div class="d-active-player">${esc(s.school)}</div><div class="d-active-sub">${esc(s.player)} &middot; 3 שאלות</div><div class="q-list">${qs}</div>`;
+}
+function dispS3(){
+  return `<div class="d-text">שער הניצוץ</div><div class="d-idle" style="margin-top:20px">סבב תמונות &middot; עד 50 נק'</div>
+    <div class="media-box" style="margin-top:30px"><div class="icon">🖼️</div><div class="ph">התמונות יוקרנו כאן — מנוהל מהבמה</div></div>`;
+}
+function dispS4(){
+  return `<div class="d-text">שאלות מסכמות</div><div class="d-idle" style="margin-top:20px">תשובה בכתב &middot; עד 60 נק'</div>`;
+}
+
+function renderBanner(){
+  const b=document.getElementById("banner");
+  const maxCeil=CEILING_STEPS[CEILING_STEPS.length-1];
+  const fillPct=Math.min(100,state.baseTotal/maxCeil*100);
+  const marks=CEILING_STEPS.map((sv,idx)=>{const step=idx+1;const pos=sv/maxCeil*100;const hit=state.ceilingHit>=step;return `<div class="meter-mark ${hit?'hit':''}" data-step="${step}" style="bottom:${pos}%"><span class="dot"></span><span>${sv}</span></div>`;}).join("");
+  const order=SCHOOLS.map((s,i)=>({s,i,t:playerTotal(i)})).sort((a,b)=>b.t-a.t);
+  const active=state.stage===2?state.s2_player:-1;
+  const rows=order.map((o,rank)=>`<div class="school-row ${o.i===active?'active':''} ${rank<3?'lead':''}" data-i="${o.i}" style="order:${rank}"><span class="rank">${rank+1}</span><span class="nm">${esc(o.s.school)}</span><span class="sc">${o.t}</span></div>`).join("");
+  b.innerHTML=`
+    <div class="meter"><div class="meter-fill" style="height:${fillPct}%"></div><div class="meter-total">תקרת זכוכית</div>${marks}</div>
+    <div class="right-col">
+      <div class="total-box"><div class="lbl">צבירה כללית</div><div class="val" id="grandVal" data-from="${grandTotal()}">${grandTotal()}</div></div>
+      <div class="schools">${rows}</div>
+    </div>`;
+  const g=document.getElementById("grandVal");if(g)rollNumber(g,grandTotal());
+}
+
+// ============ INIT ============
+document.getElementById("tgl-ceiling").addEventListener("click",()=>toggleSwitch("ceilingOn"));
+document.getElementById("tgl-combo").addEventListener("click",()=>toggleSwitch("comboOn"));
+routeTo();
+
+
+</script>
+</body>
+</html>
