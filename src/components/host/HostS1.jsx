@@ -91,7 +91,6 @@ export default function HostS1() {
               <div className={"score-card" + (on ? " maxed" : "")} key={i}>
                 <span className="nm">
                   {i + 1}. {s.school}
-                  {s.player && <small className="player-nm">{s.player}</small>}
                 </span>
                 <button className={on ? "primary" : ""} onClick={() => s1Toggle(i)}>
                   {on ? "✓ נכון" : "סמן נכון"}

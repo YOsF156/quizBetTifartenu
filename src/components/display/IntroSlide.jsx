@@ -11,7 +11,13 @@ export default function IntroSlide({ stage, leaving }) {
       {bg && (
         <>
           <div className="intro-bg" style={{ backgroundImage: `url("${bg}")` }} />
-          <img className="intro-photo" src={bg} alt="" />
+          {/* stage 1's photo is anchored to the top so the priest + ballot box show */}
+          <img
+            className="intro-photo"
+            src={bg}
+            alt=""
+            style={{ objectPosition: stage === 1 ? "center top" : "center" }}
+          />
         </>
       )}
       <div className="intro-scrim" />

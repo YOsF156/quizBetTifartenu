@@ -38,6 +38,7 @@ const DEFAULT_STATE = {
   // stage's glass-ceiling meter (helps the participants break the ceiling) ----
   audienceBonus: freshScores(), // per-school points won "from the audience"
   stageAudience: [0, 0, 0, 0], // audience points credited to each stage's meter
+  stageManual: [0, 0, 0, 0], // manual ±10 bonus credited to each stage's meter
   comboTotal: 0, // stage-2 combo bonuses
   manualBonus: 0, // manual ±10 to the general total
 
@@ -137,7 +138,8 @@ export function schoolTotal(data, i) {
 export function stageParticipantTotal(data, stage) {
   const key = STAGE_KEY[stage];
   const sa = (data.stageAudience && data.stageAudience[stage - 1]) || 0;
-  return SCHOOLS.reduce((a, _, i) => a + data.scores[key][i], 0) + sa;
+  const sm = (data.stageManual && data.stageManual[stage - 1]) || 0;
+  return SCHOOLS.reduce((a, _, i) => a + data.scores[key][i], 0) + sa + sm;
 }
 // meter value for a stage = participants' total + that stage's 400-bonus
 export function stageMeterValue(data, stage) {
@@ -165,6 +167,7 @@ function checkStageThreshold(data, stage) {
   if (data.stageCeilingHit[idx]) return null;
   if (stageParticipantTotal(data, stage) >= STAGE_THRESHOLD) {
     data.stageCeilingHit[idx] = true;
+    data.stageBonus[idx] = STAGE_BONUS; // applied immediately so the moment isn't missed
     return stage;
   }
   return null;
@@ -191,13 +194,6 @@ export const useStore = create((set, get) => {
     mutator(data);
     set({ data });
     persist(data);
-  };
-
-  // After a stage crosses 200, the break animation plays first; ~5s later we add
-  // the +50 so the meter climbs again (Banner plays the climb sound on the rise).
-  const CEILING_BONUS_DELAY = 5000;
-  const scheduleCeiling = (stage) => {
-    setTimeout(() => get().applyCeilingBonus(stage), CEILING_BONUS_DELAY);
   };
 
   return {
@@ -244,18 +240,8 @@ export const useStore = create((set, get) => {
       apply((d) => {
         d[k] = !d[k];
         if (k === "ceilingOn" && d.ceilingOn) {
-          // retroactive: apply any crossed bonuses immediately (no animation on a toggle)
-          [1, 2, 3, 4].forEach((st) => {
-            if (checkStageThreshold(d, st)) d.stageBonus[st - 1] = STAGE_BONUS;
-          });
+          [1, 2, 3, 4].forEach((st) => checkStageThreshold(d, st));
         }
-      }),
-    // apply the deferred +50 ceiling bonus (called ~5s after the break animation)
-    applyCeilingBonus: (stage) =>
-      apply((d) => {
-        const idx = stage - 1;
-        if (!d.stageCeilingHit[idx] || d.stageBonus[idx] >= STAGE_BONUS) return;
-        d.stageBonus[idx] = STAGE_BONUS; // meter climbs again + climb sound
       }),
 
     // ---- STAGE 1: mark correct per-question; meter updates ONLY on reveal ----
@@ -300,7 +286,6 @@ export const useStore = create((set, get) => {
             stageHit: hit,
             amount: winners.length * S1_PER_Q,
           });
-          if (hit) scheduleCeiling(1);
         }
       }),
     // manual timer controls (start = immediate, reset = clear)
@@ -338,7 +323,6 @@ export const useStore = create((set, get) => {
         d.scores.s2[i] = d.s2_correctCount[i] * S2_PER_CORRECT;
         const hit = checkStageThreshold(d, 2);
         fireFx(d, { type: "score2", schoolIdx: i, stageHit: hit, amount: S2_PER_CORRECT });
-        if (hit) scheduleCeiling(2);
         evaluateCombo(d);
       }),
     s2Undo: (i) =>
@@ -361,10 +345,8 @@ export const useStore = create((set, get) => {
         arr[i] = nv;
         const stage = stageOfKey(stageKey);
         const hit = checkStageThreshold(d, stage);
-        if (hit) {
-          fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: 0 });
-          scheduleCeiling(stage);
-        }
+        if (hit) fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: 0 });
+        if (stage === 2) evaluateCombo(d);
       }),
     // commit (typed value on blur/Enter) = end of entry → celebrate once
     setScore: (stageKey, i, val, max) =>
@@ -378,15 +360,24 @@ export const useStore = create((set, get) => {
         if (nv > old || hit) {
           fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: Math.max(0, nv - old) });
         }
-        if (hit) scheduleCeiling(stage);
+        if (stage === 2) evaluateCombo(d);
       }),
 
     // ---- manual GENERAL bonus ±10 (big animation on add) ----
     manualBonusAdd: (delta) =>
       apply((d) => {
         const floor = -grandExcludingManual(d);
+        const old = d.manualBonus;
         d.manualBonus = Math.max(floor, d.manualBonus + delta);
-        if (delta > 0) fireFx(d, { type: "genbonus", amount: delta });
+        const applied = d.manualBonus - old;
+        const stage = d.stage;
+        let hit = null;
+        if (stage >= 1 && stage <= 4) {
+          if (!d.stageManual) d.stageManual = [0, 0, 0, 0];
+          d.stageManual[stage - 1] += applied; // manual bonus now also feeds the stage meter
+          hit = checkStageThreshold(d, stage);
+        }
+        if (delta > 0) fireFx(d, { type: "genbonus", stageHit: hit, amount: delta });
       }),
 
     // ---- audience bonus: fixed points to a school. Counts toward the grand
@@ -401,7 +392,6 @@ export const useStore = create((set, get) => {
           hit = checkStageThreshold(d, stage);
         }
         fireFx(d, { type: "audience", schoolIdx: i, stageHit: hit, amount: AUDIENCE_BONUS });
-        if (hit) scheduleCeiling(stage);
       }),
 
     resetAll: () => {
@@ -426,6 +416,7 @@ export const useStore = create((set, get) => {
         d.stageBonus[stage - 1] = 0;
         d.stageCeilingHit[stage - 1] = false;
         d.stageAudience[stage - 1] = 0;
+        if (d.stageManual) d.stageManual[stage - 1] = 0;
         if (stage === 1) {
           d.s1_byQ = null;
           d.s1_revealed = 0;
@@ -509,7 +500,8 @@ function stageOfKey(key) {
 // combo: a player is "full" when they answered all their selected questions;
 // +10 per consecutive full pair (consecutive = adjacent in the seating order)
 function evaluateCombo(d) {
-  const full = (i) => d.s2_correctCount[i] >= s2MaxFor(d, i);
+  const fullScore = S2_PER_CORRECT * S2_CORRECT_MAX; // 30 = a "full" stage-2 score
+  const full = (i) => d.scores.s2[i] >= fullScore;
   const order = seatOrderOf(d);
   let pairs = 0;
   for (let k = 0; k < order.length - 1; k++) {

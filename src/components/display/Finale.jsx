@@ -15,8 +15,6 @@ function topSchools(data) {
   return [...map.values()].sort((a, b) => b.t - a.t);
 }
 
-const MEDALS = ["🥇", "🥈", "🥉"];
-
 export default function Finale() {
   const data = useStore((s) => s.data);
   const grand = grandTotal(data);
@@ -31,9 +29,6 @@ export default function Finale() {
     return () => clearInterval(id);
   }, []);
 
-  // podium order: 2nd, 1st, 3rd (1st in the middle, taller)
-  const podium = [top3[1], top3[0], top3[2]].filter(Boolean);
-
   return (
     <div className="finale">
       <div className="menorah">🕎</div>
@@ -42,18 +37,14 @@ export default function Finale() {
         <div className="fin-grand-lbl">הצבירה הכללית של הקופה המשותפת</div>
         <div className="fin-grand">{grand}</div>
       </div>
-      <div className="fin-top-title">שלושת בתי הספר שהכי קידמו את הקופה</div>
+      {/* three leading schools shown equally — no medals, no ranking between them */}
+      <div className="fin-top-title">שלושת בתי הספר שתרמו את מירב הנקודות לקופה הכללית</div>
       <div className="fin-podium">
-        {podium.map((p) => {
-          const place = top3.indexOf(p);
-          return (
-            <div className={"fin-place" + (place === 0 ? " first" : "")} key={p.name}>
-              <div className="fin-medal">{MEDALS[place]}</div>
-              <div className="fin-name">{p.name}</div>
-              <div className="fin-score">{p.t}</div>
-            </div>
-          );
-        })}
+        {top3.map((p) => (
+          <div className="fin-place" key={p.name}>
+            <div className="fin-name">{p.name}</div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -3,8 +3,8 @@
 export default function DisplayS3() {
   return (
     <>
-      <div className="d-text gold">שער הניצוץ</div>
-      <div className="d-idle" style={{ marginTop: 20 }}>
+      <div className="d-text d-s3-title">שער הניצוץ</div>
+      <div className="d-s3-sub" style={{ marginTop: 20 }}>
         מבחן אמריקאי בכתב · 20 שאלות · עד 30 נק'
       </div>
     </>

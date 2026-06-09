@@ -65,7 +65,6 @@ export default function DisplayS2() {
     return (
       <>
         <div className="d-active-player">{s.school}</div>
-        {s.player && <div className="d-active-name">{s.player}</div>}
         <div className="d-active-sub">{round.media}</div>
         <video
           id="s2video"
@@ -90,7 +89,6 @@ export default function DisplayS2() {
         <Timer startMs={data.timerStart} size="big" sound />
       </div>
       <div className="d-active-player">{s.school}</div>
-      {s.player && <div className="d-active-name">{s.player}</div>}
       <div className="q-list">
         {selected.map((qIdx, n) => (
           <div className="q-item q-slow" key={qIdx}>

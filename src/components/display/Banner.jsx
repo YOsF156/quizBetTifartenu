@@ -99,7 +99,10 @@ export default function Banner() {
               data-members={o.members}
               key={o.name}
             >
-              <span className="nm">{o.name}</span>
+              <span className="nm">
+                {o.name}
+                {o.idxs.length > 1 && <small className="reps">שני נציגים</small>}
+              </span>
               <span className="sc">{o.t}</span>
             </div>
           ))}

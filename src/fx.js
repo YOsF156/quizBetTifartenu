@@ -90,12 +90,8 @@ function flyLabel(text, extra) {
 }
 
 export function flyName(idx) {
-  const sc = SCHOOLS[idx];
-  // the school name and the winning student fly as two separate labels
-  flyLabel("✓ " + sc.school);
-  if (sc.player && sc.player !== "—") {
-    setTimeout(() => flyLabel("🎓 " + sc.player, "flyname-player"), 280);
-  }
+  // only the school name flies (student names removed everywhere)
+  flyLabel("✓ " + SCHOOLS[idx].school);
 }
 
 export function bumpRow(idx) {
@@ -187,22 +183,20 @@ export function runFx(fx) {
     bonusPopup("+" + fx.amount, "נקודות! ✨");
   }
 
-  // SECOND beat — the glass-ceiling break gets its own moment, AFTER the answer,
-  // confetti and flying names have played: the meter pulses/flashes as it tops out.
+  // Glass-ceiling break — fire it immediately so the exciting moment isn't missed:
+  // purple screen, fanfare, and the meter pulses/flashes as it tops out.
   if (fx.stageHit) {
-    setTimeout(() => {
-      breakMark(STAGE_THRESHOLD);
-      purpleCelebration(); // full-screen purple party for ~10s
-      playApplause(); // crowd cheering
-      playGrandFanfare(); // trumpets
-      bonusPopup("+" + STAGE_BONUS, "פריצת " + STAGE_THRESHOLD + " — מעבר לסגול! ✨");
-      const mf = document.querySelector(".meter-fill");
-      if (mf) {
-        mf.classList.remove("celebrate");
-        void mf.offsetWidth;
-        mf.classList.add("celebrate");
-        setTimeout(() => mf.classList.remove("celebrate"), 2800);
-      }
-    }, 3800);
+    breakMark(STAGE_THRESHOLD);
+    purpleCelebration(); // full-screen purple party for ~10s
+    playApplause(); // crowd cheering
+    playGrandFanfare(); // trumpets
+    bonusPopup("+" + STAGE_BONUS, "פריצת " + STAGE_THRESHOLD + " — מעבר לסגול! ✨");
+    const mf = document.querySelector(".meter-fill");
+    if (mf) {
+      mf.classList.remove("celebrate");
+      void mf.offsetWidth;
+      mf.classList.add("celebrate");
+      setTimeout(() => mf.classList.remove("celebrate"), 2800);
+    }
   }
 }

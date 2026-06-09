@@ -1,4 +1,4 @@
-import { useStore } from "../store.js";
+import { useStore, s1Q } from "../store.js";
 import { STAGE_NAMES, STAGE_BG } from "../config.js";
 import DisplayS1 from "../components/display/DisplayS1.jsx";
 import DisplayS2 from "../components/display/DisplayS2.jsx";
@@ -16,6 +16,8 @@ export default function Display() {
   const welcome = useStore((s) => s.data.welcome);
   const closing = useStore((s) => s.data.closing);
   const screensaver = useStore((s) => s.data.screensaver);
+  const s1Index = useStore((s) => s.data.s1_index);
+  const s1Len = useStore((s) => s1Q(s.data).length);
 
   const ceremony = welcome ? (
     <CeremonySlide kicker="בית תפארתנו" title="ברוכים הבאים לחידון בית תפארתנו" hint="החידון מתחיל…" />
@@ -66,7 +68,7 @@ export default function Display() {
         <div className="flyname-layer" id="flyfx" />
         <div className="stage-badge">
           <span className="pill" id="d-badge">
-            {STAGE_NAMES[stage]}
+            {stage === 1 ? `${STAGE_NAMES[1]} · ${s1Index + 1}/${s1Len}` : STAGE_NAMES[stage]}
           </span>
         </div>
         <div id="d-content">

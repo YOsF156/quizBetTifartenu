@@ -1,8 +1,10 @@
-import { useStore, s2Q, s2Selected, s2MaxFor, seatOrderOf } from "../../store.js";
+import { useStore, s2Q, s2Selected, seatOrderOf } from "../../store.js";
 import { SCHOOLS } from "../../data.js";
-import { STAGE_NAMES, S2_PER_CORRECT, COMBO_BONUS } from "../../config.js";
+import { STAGE_NAMES, COMBO_BONUS } from "../../config.js";
 import GeneralBonusBar from "./GeneralBonusBar.jsx";
 import Timer from "../Timer.jsx";
+
+const S2_MAX = 30; // free score 0–30 per participant
 
 export default function HostS2() {
   const data = useStore((s) => s.data);
@@ -10,8 +12,8 @@ export default function HostS2() {
   const s2ShowMedia = useStore((s) => s.s2ShowMedia);
   const s2PlayVideo = useStore((s) => s.s2PlayVideo);
   const s2ShowQ = useStore((s) => s.s2ShowQ);
-  const s2Correct = useStore((s) => s.s2Correct);
-  const s2Undo = useStore((s) => s.s2Undo);
+  const addScore = useStore((s) => s.addScore);
+  const setScore = useStore((s) => s.setScore);
   const startTimer = useStore((s) => s.startTimer);
   const resetTimer = useStore((s) => s.resetTimer);
   const resetAll = useStore((s) => s.resetAll);
@@ -69,43 +71,46 @@ export default function HostS2() {
 
       <div className="panel">
         <div className="hint" style={{ marginBottom: 10 }}>
-          לחץ על בית ספר כדי להגדירו <b style={{ color: "var(--gold-bright)" }}>כעונה</b>. רק העונה
-          מקבל נקודות · "✓" = +{S2_PER_CORRECT} (עד מספר השאלות שנבחרו). הסדר לפי הישיבה (נערך בטאב עריכה).
+          לחץ על שם בית ספר כדי להציג את הסרטון/השאלות שלו. הזן ניקוד חופשי 0–{S2_MAX} לכל משתתף
+          (הקלדה ישירה או +/−). הסדר לפי הישיבה (נערך בטאב עריכה).
         </div>
         <div className="score-grid s2-grid">
           {order.map((i) => {
             const s = SCHOOLS[i];
-            const cc = data.s2_correctCount[i];
-            const max = s2MaxFor(data, i);
-            const maxed = cc >= max;
+            const v = data.scores.s2[i];
             const isActive = i === data.s2_player;
             return (
               <div
-                className={"score-card" + (maxed ? " maxed" : "") + (isActive ? " active-card" : "")}
+                className={"score-card" + (v >= S2_MAX ? " maxed" : "") + (isActive ? " active-card" : "")}
                 key={i}
               >
                 <span
                   className="nm"
                   style={{ cursor: "pointer" }}
                   onClick={() => s2SetPlayer(i)}
-                  title="הגדר כעונה"
+                  title="הצג את הסרטון/השאלות של בית ספר זה"
                 >
                   {s.school}
-                  {s.player && <small className="player-nm">{s.player}</small>}
-                  <small>{cc}/{max} תשובות</small>
                 </span>
-                <span className="sc">{data.scores.s2[i]}</span>
-                <div className="btns">
-                  <button onClick={() => s2Undo(i)} disabled={cc <= 0}>
-                    ↶
+                <span className="sc">{v}</span>
+                <div className="stepper">
+                  <button onClick={() => addScore("s2", i, -5, S2_MAX)} disabled={v <= 0}>
+                    −
                   </button>
-                  <button
-                    className="primary"
-                    onClick={() => s2Correct(i)}
-                    disabled={maxed || !isActive}
-                    title={!isActive ? "רק העונה יכול לקבל נקודות" : ""}
-                  >
-                    ✓
+                  <input
+                    type="number"
+                    min={0}
+                    max={S2_MAX}
+                    step={5}
+                    defaultValue={v}
+                    key={v}
+                    onBlur={(e) => setScore("s2", i, e.target.value, S2_MAX)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") e.target.blur();
+                    }}
+                  />
+                  <button onClick={() => addScore("s2", i, 5, S2_MAX)} disabled={v >= S2_MAX}>
+                    +
                   </button>
                 </div>
               </div>
