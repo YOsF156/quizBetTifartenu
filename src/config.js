@@ -73,3 +73,8 @@ export const STAGE_INTRO_BG = {
 
 export const STORAGE_KEY = "templeQuizState";
 export const CHANNEL_NAME = "templeQuiz";
+
+// Password that unlocks the edit tab AND authorizes cloud writes (must match the
+// Firestore rule's editKey). Note: this lives in the client bundle, so it's
+// "basic" protection — it stops casual edits, not a determined attacker.
+export const EDIT_PASSWORD = "198999";

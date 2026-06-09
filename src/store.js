@@ -103,6 +103,36 @@ function persist(data) {
   if (channel) channel.postMessage({ type: "sync" });
 }
 
+// ============ cloud-synced "edit mode" content ============
+// The subset of state that the edit screen owns and that Firebase broadcasts.
+// collapse an edited array back to null when it's identical to the original, so
+// "typing back to the original" reads as no-change (matches the default baseline).
+function collapse(edited, original) {
+  if (!edited) return null;
+  return JSON.stringify(edited) === JSON.stringify(original) ? null : edited;
+}
+export function contentOf(data) {
+  return {
+    editS1: collapse(data.editS1, STAGE1),
+    editS2: collapse(data.editS2, STAGE2),
+    s2_selected: data.s2_selected,
+    seatOrder: data.seatOrder,
+  };
+}
+export function defaultContent() {
+  return {
+    editS1: null,
+    editS2: null,
+    s2_selected: STAGE2.map(() => [0, 1]),
+    seatOrder: SCHOOLS.map((_, i) => i),
+  };
+}
+// true when the live edits differ from what's saved in the cloud
+export function contentDirty(state) {
+  const base = state.cloudBaseline || defaultContent();
+  return JSON.stringify(contentOf(state.data)) !== JSON.stringify(base);
+}
+
 // ============ question sources (edited overrides original) ============
 export function s1Q(data) {
   return data.editS1 || STAGE1;
@@ -198,12 +228,30 @@ export const useStore = create((set, get) => {
 
   return {
     data: loadState(),
+    // last edit-mode content known to be in the cloud (drives the Save button's
+    // dirty/disabled state). Until the first snapshot arrives, assume defaults.
+    cloudBaseline: null,
 
     loadRemote: () => {
       applyingRemote = true;
       set({ data: loadState() });
       applyingRemote = false;
     },
+
+    // ---- cloud content (Firebase) ----
+    // apply content received from the cloud to the local store (local-only — does
+    // NOT write back to Firebase) and remember it as the saved baseline.
+    applyContent: (content) => {
+      apply((d) => {
+        d.editS1 = content.editS1 ?? null;
+        d.editS2 = content.editS2 ?? null;
+        if (content.s2_selected) d.s2_selected = content.s2_selected;
+        if (content.seatOrder) d.seatOrder = content.seatOrder;
+      });
+      set({ cloudBaseline: content });
+    },
+    // no cloud doc yet: just record the baseline (don't clobber local edits)
+    setCloudBaseline: (content) => set({ cloudBaseline: content }),
 
     // ---- general ----
     setStage: (n) =>

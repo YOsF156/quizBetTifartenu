@@ -1,6 +1,8 @@
-import { useStore, s1Q, s2Q, s2Selected, seatOrderOf } from "../../store.js";
+import { useState } from "react";
+import { useStore, s1Q, s2Q, s2Selected, seatOrderOf, contentOf, contentDirty } from "../../store.js";
 import { SCHOOLS } from "../../data.js";
 import { LETTERS } from "../../config.js";
+import { saveContent } from "../../firebase.js";
 
 // Edit stage-1 and stage-2 questions. Inputs are uncontrolled (commit on blur),
 // matching the original "onchange" behavior so typing isn't interrupted by re-renders.
@@ -12,15 +14,49 @@ export default function EditTab() {
   const seatMove = useStore((s) => s.seatMove);
   const resetEdits = useStore((s) => s.resetEdits);
 
+  // Save button: enabled only while the live edits differ from the cloud-saved
+  // copy; typing back to the saved text flips `dirty` off and disables it again.
+  const dirty = useStore(contentDirty);
+  const [saving, setSaving] = useState(false);
+  const [savedAt, setSavedAt] = useState(0); // bump to flash the "saved" badge
+  const [error, setError] = useState("");
+
+  const onSave = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      await saveContent(contentOf(useStore.getState().data));
+      setSavedAt(Date.now());
+    } catch (e) {
+      console.warn(e);
+      setError("השמירה נכשלה — בדוק חיבור לאינטרנט והרשאות");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const Q1 = s1Q(data);
   const Q2 = s2Q(data);
   const order = seatOrderOf(data);
 
   return (
     <div className="panel">
-      <h3>✎ עריכת שאלות וסדר ישיבה</h3>
+      <div className="edit-savebar">
+        <h3 style={{ margin: 0 }}>✎ עריכת שאלות וסדר ישיבה</h3>
+        <div className="edit-save-actions">
+          {error && <span className="save-msg err">{error}</span>}
+          {!dirty && savedAt > 0 && !saving && (
+            <span className="save-msg ok">✓ הנתונים נשמרו בהצלחה</span>
+          )}
+          {dirty && !saving && <span className="save-msg pending">● יש שינויים שלא נשמרו</span>}
+          <button className="primary" onClick={onSave} disabled={!dirty || saving}>
+            {saving ? "שומר…" : "💾 שמור ושדר לכל המסכים"}
+          </button>
+        </div>
+      </div>
       <div className="hint" style={{ marginBottom: 14 }}>
-        השינויים נשמרים אוטומטית ומשתקפים במסך ההקרנה. שלבים ג'/ד' מנוהלים ידנית מהבמה ואינם נערכים כאן.
+        השינויים מוצגים מיד במסך ההקרנה המקומי. לחיצה על "שמור ושדר" משדרת את השאלות לכל המכשירים דרך הענן (Firebase).
+        שלבים ג'/ד' מנוהלים ידנית מהבמה ואינם נערכים כאן.
       </div>
 
       <details open>

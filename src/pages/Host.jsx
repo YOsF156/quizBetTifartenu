@@ -5,12 +5,44 @@ import HostS2 from "../components/host/HostS2.jsx";
 import HostS3 from "../components/host/HostS3.jsx";
 import HostS4 from "../components/host/HostS4.jsx";
 import EditTab from "../components/host/EditTab.jsx";
-import { STAGE_NAMES, STAGE_INTRO_BG } from "../config.js";
+import { STAGE_NAMES, STAGE_INTRO_BG, EDIT_PASSWORD } from "../config.js";
 
 const TAB_LABELS = ["", "א", "ב", "ג", "ד"];
 
+// Password gate shown before the edit tab. Unlock persists for the session only.
+function EditGate({ onUnlock }) {
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState(false);
+  const submit = (e) => {
+    e.preventDefault();
+    if (pw === EDIT_PASSWORD) onUnlock();
+    else setErr(true);
+  };
+  return (
+    <div className="panel edit-gate">
+      <h3>🔒 מצב עריכה מוגן</h3>
+      <div className="hint" style={{ marginBottom: 12 }}>
+        עריכת השאלות ושידורן לכל המסכים מוגנים בסיסמה. הזן את סיסמת העריכה כדי להמשיך.
+      </div>
+      <form onSubmit={submit} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <input
+          type="password"
+          autoFocus
+          value={pw}
+          onChange={(e) => { setPw(e.target.value); setErr(false); }}
+          placeholder="סיסמה"
+          style={{ width: 200 }}
+        />
+        <button className="primary" type="submit">כניסה</button>
+        {err && <span className="save-msg err">סיסמה שגויה</span>}
+      </form>
+    </div>
+  );
+}
+
 export default function Host() {
   const [hostTab, setHostTab] = useState("play"); // play | edit
+  const [editUnlocked, setEditUnlocked] = useState(false);
   const stage = useStore((s) => s.data.stage);
   const intro = useStore((s) => s.data.intro);
   const ceilingOn = useStore((s) => s.data.ceilingOn);
@@ -107,7 +139,7 @@ export default function Host() {
 
       <div id="hostStage">
         {hostTab === "edit" ? (
-          <EditTab />
+          editUnlocked ? <EditTab /> : <EditGate onUnlock={() => setEditUnlocked(true)} />
         ) : stage === 5 ? (
           <div className="panel">
             <span className="pill">מסך סיום</span>
