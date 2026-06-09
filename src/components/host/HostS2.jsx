@@ -119,7 +119,7 @@ export default function HostS2() {
         </div>
       </div>
 
-      <div className="panel">
+      <div className="panel col-bonus">
         <h3>איפוס וניקוד כללי</h3>
         <div className="controls">
           <button className="ghost" onClick={() => resetStage(2)}>

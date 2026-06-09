@@ -222,8 +222,17 @@ export const useStore = create((set, get) => {
         d.intro = false;
         d.welcome = false;
         d.closing = false;
-        // entering stage 1 enters a question → auto-arm the countdown
-        if (d.stage === 1) d.timerStart = Date.now() + TIMER_ARM_MS;
+        // always enter a stage clean: never on a revealed answer, never with media
+        // auto-playing or the questions already shown
+        if (d.stage === 1) {
+          d.s1_revealed = 0;
+          d.timerStart = Date.now() + TIMER_ARM_MS; // auto-arm the countdown
+        } else if (d.stage === 2) {
+          d.s2_phase = "media"; // media stage (paused) — not the questions
+          d.timerStart = null;
+        } else {
+          d.timerStart = null;
+        }
       }),
     // re-show the opening slide for the current stage
     showIntro: () =>
