@@ -20,10 +20,9 @@ export default function IntroSlide({ stage, leaving }) {
   const [mode, setMode] = useState(0);
   const photoStyle =
     stage === 1 ? PHOTO_MODES[mode].style : { objectFit: "cover", objectPosition: "center" };
-  // show the framing switcher in dev, or live via ?dev (so the partner can decide)
-  const showFraming =
-    import.meta.env.DEV ||
-    (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("dev"));
+  // show the framing switcher everywhere (dev + live deploy) so the partner can
+  // always pick the framing from the display, no ?dev flag needed.
+  const showFraming = true;
 
   return (
     <div className={"intro-slide" + (leaving ? " leaving" : "")} onClick={unlockAudio}>
