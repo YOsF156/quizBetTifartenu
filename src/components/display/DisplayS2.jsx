@@ -8,6 +8,7 @@ export default function DisplayS2() {
   const s2ShowQ = useStore((s) => s.s2ShowQ);
   const videoRef = useRef(null);
   const [fading, setFading] = useState(false);
+  const [covered, setCovered] = useState(false); // CSS full-bleed cover mode
   // ignore whatever token is already set when the display opens (don't replay)
   const lastPlayToken = useRef(data.s2_playToken);
   const Q = s2Q(data);
@@ -26,6 +27,8 @@ export default function DisplayS2() {
     const v = videoRef.current;
     if (!v) return;
     setFading(false);
+    setCovered(true); // CSS full-bleed — always works, no gesture needed
+    requestFs(v); // best-effort true fullscreen (browser may block without a gesture)
     try {
       v.currentTime = 0;
     } catch (e) {
@@ -40,20 +43,45 @@ export default function DisplayS2() {
     }
   }, [data.s2_playToken, data.s2_phase, data.intro]);
 
-  const playVideoFs = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.requestFullscreen) v.requestFullscreen();
-    else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
-    v.play();
+  // leaving the media phase tears down the cover so questions render normally
+  useEffect(() => {
+    if (data.s2_phase !== "media") setCovered(false);
+  }, [data.s2_phase]);
+
+  const requestFs = (v) => {
+    try {
+      if (v.requestFullscreen) v.requestFullscreen();
+      else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+    } catch (e) {
+      /* blocked without a user gesture — CSS cover mode still fills the screen */
+    }
   };
 
-  // when the clip finishes: leave fullscreen, softly fade the video out and hold a
-  // beat so participants can digest the clip, then reveal the questions.
-  const onVideoEnded = () => {
+  const exitFs = () => {
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
     else if (document.webkitFullscreenElement && document.webkitExitFullscreen)
       document.webkitExitFullscreen();
+  };
+
+  // manual toggle from the display itself (click on the video, or the button)
+  const toggleBig = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (covered) {
+      setCovered(false);
+      exitFs();
+    } else {
+      setCovered(true);
+      requestFs(v);
+      v.play();
+    }
+  };
+
+  // when the clip finishes: leave fullscreen/cover, softly fade the video out and
+  // hold a beat so participants can digest the clip, then reveal the questions.
+  const onVideoEnded = () => {
+    exitFs();
+    setCovered(false);
     setFading(true);
     setTimeout(() => {
       setFading(false);
@@ -69,15 +97,15 @@ export default function DisplayS2() {
         <video
           id="s2video"
           ref={videoRef}
-          className={"s2-video" + (fading ? " fading" : "")}
+          className={"s2-video" + (fading ? " fading" : "") + (covered ? " cover" : "")}
           src={round.video || ""}
           controls
           preload="auto"
-          onClick={playVideoFs}
+          onClick={toggleBig}
           onEnded={onVideoEnded}
         ></video>
-        <button className="primary" style={{ marginTop: 16 }} onClick={playVideoFs}>
-          ⛶ מסך מלא
+        <button className="primary" style={{ marginTop: 16 }} onClick={toggleBig}>
+          {covered ? "⤢ הקטן" : "⛶ מסך מלא"}
         </button>
       </>
     );
