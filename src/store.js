@@ -345,7 +345,12 @@ export const useStore = create((set, get) => {
         arr[i] = nv;
         const stage = stageOfKey(stageKey);
         const hit = checkStageThreshold(d, stage);
-        if (hit) fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: 0 });
+        if (stage === 2 && nv > old) {
+          // stage 2: every points add celebrates (confetti + flying school name)
+          fireFx(d, { type: "score2", schoolIdx: i, stageHit: hit, amount: nv - old });
+        } else if (hit) {
+          fireFx(d, { type: "score", schoolIdx: i, stageHit: hit, amount: 0 });
+        }
         if (stage === 2) evaluateCombo(d);
       }),
     // commit (typed value on blur/Enter) = end of entry → celebrate once

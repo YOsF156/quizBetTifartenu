@@ -257,6 +257,11 @@ details summary{cursor:pointer;color:var(--gold);font-size:14px;padding:4px 0;us
 .s2-host .score-card .nm small{font-size:10px}
 .s2-host .score-card .sc{min-width:34px;font-size:15px}
 .s2-host .score-card .btns button{padding:6px 12px;font-size:15px}
+/* stage-2 host: 3 columns fit, and the score adder is compact (no big box) */
+.s2-host .host-cols>.panel{flex:1 1 290px}
+.s2-host .stepper{gap:4px}
+.s2-host .stepper button{padding:5px 10px;font-size:16px}
+.s2-host .stepper input{width:42px;padding:5px;font-size:14px}
 /* ---- fixed photo background per stage (stages 1/3/4) ----
    The light scrim is baked into the background image layers (set inline in
    Display.jsx) so the stage-area stays the positioning context for the timer. */
