@@ -218,11 +218,6 @@ details summary{cursor:pointer;color:var(--gold);font-size:14px;padding:4px 0;us
 @keyframes flyTop{0%{opacity:0;transform:translateY(-120vh) rotate(-4deg)}55%{opacity:1;transform:translateY(0) rotate(0)}86%{opacity:1}100%{opacity:0;transform:translateY(6vh)}}
 @keyframes flyBottom{0%{opacity:0;transform:translateY(120vh) rotate(4deg)}55%{opacity:1;transform:translateY(0) rotate(0)}86%{opacity:1}100%{opacity:0;transform:translateY(-6vh)}}
 .slide-logo{position:absolute;top:16px;right:40px;left:auto;height:72px;width:auto;z-index:5;filter:drop-shadow(0 4px 16px rgba(0,0,0,.7))}
-/* DEV-only photo-framing switcher on the opening slide */
-.dev-photo-bar{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:20;display:flex;gap:8px;align-items:center;background:rgba(8,11,20,.82);border:1px solid var(--gold-deep);border-radius:12px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.dev-photo-bar .dev-tag{color:var(--gold-bright);font-size:13px;font-weight:700;white-space:nowrap}
-.dev-photo-bar button{padding:6px 12px;font-size:13px}
-.dev-photo-bar button.on{background:var(--gold-deep);border-color:var(--gold);color:#fff}
 .intro-spotlight{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle, rgba(255,246,213,.30), rgba(255,246,213,0) 42%);background-size:150% 150%;background-repeat:no-repeat;mix-blend-mode:screen;animation:spotSweep 7s ease-in-out infinite alternate}
 @keyframes spotSweep{0%{background-position:30% 34%}100%{background-position:70% 46%}}
 .intro-kicker{color:var(--gold-bright);font-size:26px;letter-spacing:3px;margin-bottom:14px;font-weight:700;text-shadow:0 2px 12px rgba(0,0,0,.75)}
