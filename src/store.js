@@ -105,24 +105,21 @@ function persist(data) {
 
 // ============ cloud-synced "edit mode" content ============
 // The subset of state that the edit screen owns and that Firebase broadcasts.
-// collapse an edited array back to null when it's identical to the original, so
-// "typing back to the original" reads as no-change (matches the default baseline).
-function collapse(edited, original) {
-  if (!edited) return null;
-  return JSON.stringify(edited) === JSON.stringify(original) ? null : edited;
-}
+// The content blob always carries the FULL resolved question arrays (not "null =
+// default"), so the Firebase document holds the real stage-1/2 questions as
+// concrete entities — both for the initial seed and for every later save.
 export function contentOf(data) {
   return {
-    editS1: collapse(data.editS1, STAGE1),
-    editS2: collapse(data.editS2, STAGE2),
+    editS1: s1Q(data),
+    editS2: s2Q(data),
     s2_selected: data.s2_selected,
     seatOrder: data.seatOrder,
   };
 }
 export function defaultContent() {
   return {
-    editS1: null,
-    editS2: null,
+    editS1: STAGE1,
+    editS2: STAGE2,
     s2_selected: STAGE2.map(() => [0, 1]),
     seatOrder: SCHOOLS.map((_, i) => i),
   };

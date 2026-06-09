@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useSync } from "./useSync.js";
-import { useStore, defaultContent } from "./store.js";
-import { subscribeContent } from "./firebase.js";
+import { useStore, defaultContent, contentOf } from "./store.js";
+import { subscribeContent, saveContent } from "./firebase.js";
 import { unlockAudio } from "./sound.js";
 import Landing from "./pages/Landing.jsx";
 import Host from "./pages/Host.jsx";
@@ -14,10 +14,26 @@ export default function App() {
   // Firebase: broadcast the edit-mode content (questions/order) across devices.
   const applyContent = useStore((s) => s.applyContent);
   const setCloudBaseline = useStore((s) => s.setCloudBaseline);
+  const seededRef = useRef(false);
   useEffect(() => {
     const unsub = subscribeContent((content) => {
-      if (content) applyContent(content);
-      else setCloudBaseline(defaultContent()); // no cloud doc yet → defaults
+      if (content) {
+        applyContent(content);
+        return;
+      }
+      // No cloud document yet: fall back to defaults, and do a ONE-TIME initial
+      // seed from the host so the full stage-1/2 questions (and everything in
+      // edit mode) are written to Firebase as real entities. After that, the
+      // host updates them via the "save & broadcast" button.
+      setCloudBaseline(defaultContent());
+      const isHost =
+        typeof window !== "undefined" && window.location.pathname.startsWith("/host");
+      if (isHost && !seededRef.current) {
+        seededRef.current = true;
+        saveContent(contentOf(useStore.getState().data)).catch((e) =>
+          console.warn("initial seed failed (set Firestore rules?)", e)
+        );
+      }
     });
     return unsub;
   }, [applyContent, setCloudBaseline]);
